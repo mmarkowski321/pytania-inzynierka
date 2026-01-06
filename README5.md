@@ -1,5 +1,143 @@
 # Ocena Złożoności Algorytmów — Kompletna Notatka do Obrony
 
+## 0) Podstawy — od zera (dla początkujących)
+
+### Co to jest algorytm?
+
+**Algorytm** = krok po kroku instrukcje, jak rozwiązać problem.
+
+**Przykład z życia:**
+- **Problem:** Jak ugotować jajko?
+- **Algorytm:**
+  1. Wlej wodę do garnka
+  2. Zagotuj wodę
+  3. Włóż jajko
+  4. Gotuj 5 minut
+  5. Wyjmij jajko
+
+**W programowaniu:**
+- **Problem:** Znajdź największą liczbę w tablicy
+- **Algorytm:**
+  1. Weź pierwszą liczbę jako maksimum
+  2. Dla każdej kolejnej liczby:
+     - Jeśli jest większa niż maksimum → ustaw jako nowe maksimum
+  3. Zwróć maksimum
+
+### Co to jest złożoność algorytmu?
+
+**Złożoność** = jak szybko rośnie czas wykonania lub pamięć, gdy zwiększamy rozmiar danych.
+
+**Przykład intuicyjny:**
+- **Problem:** Znajdź numer telefonu w książce telefonicznej
+- **Rozmiar danych:** n = liczba osób w książce
+- **Pytanie:** Jak szybko rośnie czas wyszukiwania, gdy książka ma więcej osób?
+
+**Dwa algorytmy:**
+
+**Algorytm 1: Wyszukiwanie liniowe**
+- Sprawdzaj od początku do końca, jedna po drugiej
+- W najgorszym przypadku: sprawdzisz wszystkie n osób
+- **Złożoność:** O(n) — czas rośnie liniowo
+
+**Algorytm 2: Wyszukiwanie binarne**
+- Otwórz książkę w połowie
+- Jeśli szukane nazwisko jest wcześniej → szukaj w pierwszej połowie
+- Jeśli później → szukaj w drugiej połowie
+- Powtarzaj, aż znajdziesz
+- **Złożoność:** O(log n) — czas rośnie logarytmicznie (dużo szybciej!)
+
+**Porównanie dla n = 1 000 000:**
+- Algorytm 1: ~1 000 000 sprawdzeń (w najgorszym przypadku)
+- Algorytm 2: ~20 sprawdzeń (log₂(1 000 000) ≈ 20)
+
+**Różnica jest ogromna!**
+
+### Dlaczego złożoność jest ważna?
+
+**Problem:** Komputer może wykonać ~1 miliard operacji na sekundę.
+
+**Scenariusz:** Masz tablicę z 1 miliardem liczb i chcesz je posortować.
+
+**Algorytm O(n²):**
+- Operacje: n² = (10⁹)² = 10¹⁸ operacji
+- Czas: 10¹⁸ / 10⁹ = 10⁹ sekund = **~31 lat!** 😱
+
+**Algorytm O(n log n):**
+- Operacje: n log n = 10⁹ × log(10⁹) ≈ 10⁹ × 30 = 3 × 10¹⁰ operacji
+- Czas: 3 × 10¹⁰ / 10⁹ = 30 sekund ✓
+
+**Wniosek:** Wybór algorytmu ma ogromne znaczenie!
+
+### Co oznacza "n"?
+
+**n** = rozmiar danych wejściowych (liczba elementów do przetworzenia).
+
+**Przykłady:**
+- Tablica z liczbami: n = długość tablicy
+- Lista studentów: n = liczba studentów
+- Graf: n = liczba węzłów
+- Macierz: n = liczba wierszy (lub kolumn)
+
+**Przykład:**
+```java
+int[] array = {1, 5, 3, 9, 2};  // n = 5
+for (int i = 0; i < array.length; i++) {  // n iteracji
+    System.out.println(array[i]);
+}
+```
+
+### Co to jest operacja podstawowa?
+
+**Operacja podstawowa** = pojedyncza, prosta operacja, która zajmuje stały czas.
+
+**Przykłady operacji podstawowych:**
+- Przypisanie: `x = 5`
+- Porównanie: `if (a > b)`
+- Arytmetyka: `a + b`, `a * b`
+- Dostęp do tablicy: `array[i]`
+- Wywołanie funkcji: `function()`
+
+**Przykład zliczania operacji:**
+```java
+int sum = 0;                    // 1 operacja (przypisanie)
+for (int i = 0; i < n; i++) {   // n iteracji
+    sum += array[i];            // 2 operacje w każdej iteracji (dostęp + dodawanie)
+}
+return sum;                     // 1 operacja (return)
+
+// Razem: 1 + n * 2 + 1 = 2n + 2 operacji
+```
+
+### Co to jest czas wykonania?
+
+**Czas wykonania T(n)** = liczba operacji podstawowych dla danych rozmiaru n.
+
+**Przykład:**
+- Algorytm wykonuje 3n + 5 operacji dla danych rozmiaru n
+- T(n) = 3n + 5
+- Dla n = 100: T(100) = 3 × 100 + 5 = 305 operacji
+
+**Uwaga:** Nie mierzymy czasu w sekundach, tylko w liczbie operacji!
+- Różne komputery mają różną prędkość
+- Liczba operacji jest uniwersalna
+
+### Co to jest asymptotyczna analiza?
+
+**Asymptotyczna analiza** = analiza zachowania algorytmu dla **bardzo dużych** n (n → ∞).
+
+**Dlaczego?**
+- Dla małych n różnice są nieistotne
+- Dla dużych n różnice są ogromne
+- Chcemy wiedzieć, jak algorytm zachowa się w praktyce
+
+**Przykład:**
+- T(n) = 3n + 5
+- Dla małych n: stała 5 jest ważna
+- Dla dużych n: 3n dominuje, stała 5 jest nieistotna
+- **Asymptotycznie:** T(n) ≈ 3n = O(n)
+
+---
+
 ## 1) Wprowadzenie — po co oceniać złożoność?
 
 ### Dlaczego złożoność algorytmów jest ważna?
@@ -12,15 +150,55 @@
 - Czy istnieje lepszy algorytm?
 - Czy rozwiązanie jest praktyczne dla danych problemów?
 
-### Przykład problemu:
+### Przykład problemu — szczegółowa analiza:
 
-Dwa algorytmy wyszukiwania:
-- **Algorytm A:** O(n) — czas rośnie liniowo
-- **Algorytm B:** O(n²) — czas rośnie kwadratowo
+**Scenariusz:** Masz tablicę z 1000 liczb i chcesz znaleźć największą.
 
-Dla n = 1000:
-- Algorytm A: ~1000 operacji
-- Algorytm B: ~1 000 000 operacji
+**Algorytm A: Wyszukiwanie liniowe — O(n)**
+```java
+int findMax(int[] array) {
+    int max = array[0];                    // 1 operacja
+    for (int i = 1; i < array.length; i++) {  // n-1 iteracji
+        if (array[i] > max) {              // 1 porównanie
+            max = array[i];                // 1 przypisanie (czasami)
+        }
+    }
+    return max;                            // 1 operacja
+}
+```
+
+**Analiza:**
+- Operacje: 1 + (n-1) × 2 + 1 = 2n operacji
+- Dla n = 1000: 2000 operacji
+- **Złożoność:** O(n) — czas rośnie liniowo
+
+**Algorytm B: Sortowanie + wybór — O(n²)**
+```java
+int findMaxBad(int[] array) {
+    // Najpierw sortuj (bubble sort - O(n²))
+    for (int i = 0; i < array.length; i++) {        // n iteracji
+        for (int j = 0; j < array.length - 1; j++) { // n iteracji
+            if (array[j] > array[j+1]) {
+                swap(array, j, j+1);
+            }
+        }
+    }
+    return array[array.length - 1];  // Ostatni element
+}
+```
+
+**Analiza:**
+- Operacje: n × n = n² operacji
+- Dla n = 1000: 1 000 000 operacji
+- **Złożoność:** O(n²) — czas rośnie kwadratowo
+
+**Porównanie:**
+- n = 1000: Algorytm A = 2000 operacji, Algorytm B = 1 000 000 operacji
+- **Różnica:** 500x wolniejszy!
+
+**Dla n = 1 000 000:**
+- Algorytm A: 2 000 000 operacji (~0.002 sekundy)
+- Algorytm B: 1 000 000 000 000 operacji (~1000 sekund = ~16 minut!)
 
 **Różnica jest ogromna!**
 
@@ -90,57 +268,194 @@ Jeśli T(n) = 3n + 5, to T(n) = Θ(n)
 O(1) < O(log n) < O(√n) < O(n) < O(n log n) < O(n²) < O(n³) < O(2^n) < O(n!)
 ```
 
-### O(1) — złożoność stała
+### O(1) — złożoność stała — szczegółowo
 
 **Charakterystyka:**
 - Czas wykonania **nie zależy** od rozmiaru danych
 - Najlepsza możliwa złożoność
-- Operacja zawsze trwa tyle samo
+- Operacja zawsze trwa tyle samo, niezależnie od n
 
-**Przykłady:**
-- Dostęp do elementu tablicy przez indeks
-- Dodanie elementu na koniec listy (jeśli mamy wskaźnik)
-- Operacje na hash table (w idealnym przypadku)
-- Operacje matematyczne (dodawanie, mnożenie)
+**Intuicja:** To jak otwarcie drzwi — zawsze zajmuje tyle samo czasu, niezależnie od tego, ile osób jest w pokoju.
 
-**Kod:**
+**Przykłady szczegółowe:**
+
+**Przykład 1: Dostęp do elementu tablicy**
 ```java
 int getElement(int[] array, int index) {
-    return array[index];  // O(1) - stały czas niezależnie od rozmiaru
+    return array[index];  // 1 operacja - zawsze
+}
+```
+
+**Analiza:**
+- Operacje: 1 (dostęp do tablicy)
+- Dla n = 10: 1 operacja
+- Dla n = 1000: 1 operacja
+- Dla n = 1 000 000: 1 operacja
+- **Złożoność:** O(1) — stała
+
+**Dlaczego O(1)?**
+- Komputer wie dokładnie, gdzie w pamięci jest element (adres = początek + indeks × rozmiar)
+- Nie musi przeszukiwać — idzie bezpośrednio
+
+**Przykład 2: Dodanie na koniec ArrayList (amortyzowana)**
+```java
+ArrayList<Integer> list = new ArrayList<>();
+list.add(5);  // O(1) amortyzowana
+```
+
+**Analiza:**
+- W większości przypadków: O(1) — dodaje na koniec
+- Czasami: O(n) — gdy trzeba powiększyć tablicę (ale rzadko)
+- **Amortyzowana złożoność:** O(1)
+
+**Przykład 3: Operacje na HashMap (idealny przypadek)**
+```java
+HashMap<String, Integer> map = new HashMap<>();
+map.put("key", 5);     // O(1) średnio
+map.get("key");        // O(1) średnio
+```
+
+**Analiza:**
+- Hash table oblicza hash klucza → idzie bezpośrednio do odpowiedniego miejsca
+- W idealnym przypadku: O(1)
+- W najgorszym (wszystkie klucze mają ten sam hash): O(n)
+
+**Przykład 4: Operacje matematyczne**
+```java
+int add(int a, int b) {
+    return a + b;  // O(1) - zawsze 1 operacja
+}
+
+int multiply(int a, int b) {
+    return a * b;  // O(1) - zawsze 1 operacja
 }
 ```
 
 **Wykres:** Linia pozioma (nie rośnie)
+```
+Czas
+  |
+  |──────────────────────────── (stały)
+  |
+  └─────────────────────────────→ n
+```
 
-### O(log n) — złożoność logarytmiczna
+**Tabela porównawcza:**
+| n | Operacje O(1) |
+|---|---------------|
+| 10 | 1 |
+| 100 | 1 |
+| 1000 | 1 |
+| 1 000 000 | 1 |
+
+**Wniosek:** O(1) to najlepsza możliwa złożoność — zawsze szybka!
+
+### O(log n) — złożoność logarytmiczna — szczegółowo
 
 **Charakterystyka:**
 - Czas rośnie **bardzo wolno**
 - Podwajanie danych = +1 operacja
 - Bardzo dobra złożoność
 
-**Przykłady:**
-- Wyszukiwanie binarne (binary search)
-- Operacje na drzewie binarnym (balanced BST)
-- Wyszukiwanie w posortowanej tablicy
+**Intuicja:** To jak szukanie słowa w słowniku — za każdym razem eliminujesz połowę możliwości.
 
-**Kod (binary search):**
+**Przykład z życia:**
+- **Problem:** Znajdź numer telefonu w książce telefonicznej (alfabetycznie)
+- **Algorytm:** Otwórz w połowie → sprawdź → wybierz odpowiednią połowę → powtarzaj
+- **Kroki:** log₂(n) — dla 1 000 000 osób potrzebujesz ~20 kroków!
+
+**Przykład szczegółowy: Binary Search**
+
+**Kod:**
 ```java
 int binarySearch(int[] array, int target) {
-    int left = 0, right = array.length - 1;
+    int left = 0;
+    int right = array.length - 1;
+    
     while (left <= right) {
-        int mid = (left + right) / 2;  // O(log n) iteracji
-        if (array[mid] == target) return mid;
-        if (array[mid] < target) left = mid + 1;
-        else right = mid - 1;
+        int mid = (left + right) / 2;  // Środek
+        
+        if (array[mid] == target) {
+            return mid;  // Znaleziono!
+        }
+        
+        if (array[mid] < target) {
+            left = mid + 1;  // Szukaj w prawej połowie
+        } else {
+            right = mid - 1;  // Szukaj w lewej połowie
+        }
     }
-    return -1;
+    
+    return -1;  // Nie znaleziono
 }
 ```
 
-**Wykres:** Rośnie bardzo wolno, prawie poziomo
+**Analiza krok po kroku:**
 
-**Ciekawe:** log₂(1 000 000) ≈ 20, log₂(1 000 000 000) ≈ 30
+**Przykład:** Szukamy 7 w tablicy [1, 3, 5, 7, 9, 11, 13] (n = 7)
+
+**Iteracja 1:**
+- left = 0, right = 6
+- mid = (0 + 6) / 2 = 3
+- array[3] = 7 → znaleziono! ✓
+- **Operacje:** 1 porównanie
+
+**Gdyby szukali 9:**
+
+**Iteracja 1:**
+- left = 0, right = 6
+- mid = 3, array[3] = 7
+- 7 < 9 → left = 4 (szukaj w prawej połowie)
+- **Pozostało:** 3 elementy (9, 11, 13)
+
+**Iteracja 2:**
+- left = 4, right = 6
+- mid = 5, array[5] = 11
+- 11 > 9 → right = 4 (szukaj w lewej połowie)
+- **Pozostało:** 1 element (9)
+
+**Iteracja 3:**
+- left = 4, right = 4
+- mid = 4, array[4] = 9 → znaleziono! ✓
+- **Operacje:** 3 porównania
+
+**Analiza matematyczna:**
+- Po każdej iteracji obszar przeszukiwania zmniejsza się o połowę
+- n → n/2 → n/4 → n/8 → ... → 1
+- Liczba kroków: log₂(n)
+- **Złożoność:** O(log n)
+
+**Tabela porównawcza:**
+| n | Operacje O(log n) | Porównanie z O(n) |
+|---|-------------------|-------------------|
+| 10 | ~3 | 10 |
+| 100 | ~7 | 100 |
+| 1000 | ~10 | 1000 |
+| 1 000 000 | ~20 | 1 000 000 |
+
+**Wykres:** Rośnie bardzo wolno, prawie poziomo
+```
+Czas
+  |
+  |     ╱
+  |    ╱
+  |   ╱
+  |  ╱
+  | ╱
+  └─────────────────────────────→ n
+```
+
+**Ciekawe fakty:**
+- log₂(1 000 000) ≈ 20
+- log₂(1 000 000 000) ≈ 30
+- **Podwajanie danych = +1 operacja!**
+
+**Inne przykłady O(log n):**
+- Operacje na drzewie binarnym (zbalansowanym)
+- Wyszukiwanie w posortowanej tablicy
+- Operacje na kopcu (heap)
+
+**Wniosek:** O(log n) to bardzo dobra złożoność — praktycznie stała dla dużych n!
 
 ### O(√n) — złożoność pierwiastkowa
 
@@ -162,32 +477,104 @@ boolean isPrime(int n) {
 }
 ```
 
-### O(n) — złożoność liniowa
+### O(n) — złożoność liniowa — szczegółowo
 
 **Charakterystyka:**
 - Czas rośnie **proporcjonalnie** do rozmiaru danych
 - Podwajanie danych = podwójny czas
 - Dobra złożoność dla większości zastosowań
 
-**Przykłady:**
-- Przejście przez tablicę/listę (jedna pętla)
-- Wyszukiwanie liniowe
-- Znajdowanie maksimum/minimum
-- Kopiowanie tablicy
-- Wypisanie wszystkich elementów
+**Intuicja:** To jak sprawdzanie listy osób — musisz sprawdzić każdą osobę, więc czas rośnie liniowo z liczbą osób.
 
-**Kod:**
+**Przykłady szczegółowe:**
+
+**Przykład 1: Znajdowanie maksimum**
 ```java
 int findMax(int[] array) {
-    int max = array[0];
-    for (int i = 1; i < array.length; i++) {  // O(n) iteracji
-        if (array[i] > max) max = array[i];
+    int max = array[0];                    // 1 operacja
+    for (int i = 1; i < array.length; i++) {  // n-1 iteracji
+        if (array[i] > max) {              // 1 porównanie
+            max = array[i];                // 1 przypisanie (czasami)
+        }
     }
-    return max;
+    return max;                            // 1 operacja
 }
 ```
 
+**Analiza:**
+- Operacje: 1 + (n-1) × 2 + 1 = 2n operacji
+- **Złożoność:** O(n)
+
+**Przykład 2: Sumowanie elementów**
+```java
+int sum(int[] array) {
+    int sum = 0;                           // 1 operacja
+    for (int i = 0; i < array.length; i++) {  // n iteracji
+        sum += array[i];                   // 2 operacje (dostęp + dodawanie)
+    }
+    return sum;                            // 1 operacja
+}
+```
+
+**Analiza:**
+- Operacje: 1 + n × 2 + 1 = 2n + 2
+- Upraszczając: O(n)
+
+**Przykład 3: Wyszukiwanie liniowe**
+```java
+int linearSearch(int[] array, int target) {
+    for (int i = 0; i < array.length; i++) {  // n iteracji
+        if (array[i] == target) {          // 1 porównanie
+            return i;                      // 1 return (czasami)
+        }
+    }
+    return -1;                             // 1 operacja (w najgorszym przypadku)
+}
+```
+
+**Analiza:**
+- Najlepszy przypadek: O(1) — element na pierwszej pozycji
+- Najgorszy przypadek: O(n) — element na końcu lub brak
+- Przeciętny przypadek: O(n) — element w środku
+- **W praktyce:** O(n) — analizujemy najgorszy przypadek
+
+**Przykład 4: Kopiowanie tablicy**
+```java
+int[] copyArray(int[] original) {
+    int[] copy = new int[original.length];  // 1 operacja (alokacja)
+    for (int i = 0; i < original.length; i++) {  // n iteracji
+        copy[i] = original[i];              // 2 operacje (dostęp + przypisanie)
+    }
+    return copy;                            // 1 operacja
+}
+```
+
+**Analiza:**
+- Operacje: 1 + n × 2 + 1 = 2n + 2
+- **Złożoność czasowa:** O(n)
+- **Złożoność pamięciowa:** O(n) — nowa tablica
+
+**Tabela porównawcza:**
+| n | Operacje O(n) | Czas (przy 1 mld op/s) |
+|---|---------------|------------------------|
+| 10 | 10 | 0.00000001 s |
+| 100 | 100 | 0.0000001 s |
+| 1000 | 1000 | 0.000001 s |
+| 1 000 000 | 1 000 000 | 0.001 s |
+| 1 000 000 000 | 1 000 000 000 | 1 s |
+
 **Wykres:** Linia prosta pod kątem 45°
+```
+Czas
+  |
+  |    ╱
+  |   ╱
+  |  ╱
+  | ╱
+  └─────────────────────────────→ n
+```
+
+**Wniosek:** O(n) to dobra złożoność — akceptowalna dla większości zastosowań.
 
 ### O(n log n) — złożoność liniowo-logarytmiczna
 
@@ -217,37 +604,128 @@ void mergeSort(int[] array, int left, int right) {
 
 **Wykres:** Rośnie szybciej niż liniowo, ale wolniej niż kwadratowo
 
-### O(n²) — złożoność kwadratowa
+### O(n²) — złożoność kwadratowa — szczegółowo
 
 **Charakterystyka:**
 - Czas rośnie **kwadratowo** z rozmiarem
 - Podwajanie danych = 4x czas
 - Za wolna dla dużych danych
 
-**Przykłady:**
-- Bubble Sort
-- Selection Sort
-- Insertion Sort (najgorszy przypadek)
-- Dwie zagnieżdżone pętle po n elementach
-- Sprawdzanie wszystkich par elementów
+**Intuicja:** To jak sprawdzanie wszystkich par osób — dla n osób masz n × n = n² par do sprawdzenia.
 
-**Kod:**
+**Przykład z życia:**
+- **Problem:** Sprawdź, czy w grupie są dwie osoby z tym samym imieniem
+- **Algorytm:** Porównaj każdą osobę z każdą
+- **Operacje:** n × n = n² porównań
+
+**Przykłady szczegółowe:**
+
+**Przykład 1: Bubble Sort — szczegółowa analiza**
 ```java
 void bubbleSort(int[] array) {
-    for (int i = 0; i < array.length; i++) {           // n iteracji
-        for (int j = 0; j < array.length - 1; j++) {   // n iteracji
+    for (int i = 0; i < array.length; i++) {           // Pętla zewnętrzna
+        for (int j = 0; j < array.length - 1 - i; j++) {   // Pętla wewnętrzna
             if (array[j] > array[j + 1]) {
-                swap(array, j, j + 1);
+                swap(array, j, j + 1);                  // 3 operacje
             }
         }
     }
-    // O(n * n) = O(n²)
 }
 ```
 
-**Wykres:** Parabola (rośnie szybko)
+**Analiza krok po kroku:**
 
-**Ostrzeżenie:** Dla n = 1000 → 1 000 000 operacji, dla n = 10000 → 100 000 000 operacji
+**Pętla zewnętrzna:**
+- Liczba iteracji: n
+- W każdej iteracji wykonuje się pętla wewnętrzna
+
+**Pętla wewnętrzna:**
+- Iteracja 1: n-1 porównań
+- Iteracja 2: n-2 porównań
+- Iteracja 3: n-3 porównań
+- ...
+- Iteracja n: 0 porównań
+
+**Całkowita liczba porównań:**
+- (n-1) + (n-2) + (n-3) + ... + 1 + 0
+- = n(n-1)/2
+- = (n² - n)/2
+- Upraszczając: O(n²)
+
+**Przykład 2: Sprawdzanie wszystkich par**
+```java
+void printAllPairs(int[] array) {
+    for (int i = 0; i < array.length; i++) {        // n iteracji
+        for (int j = 0; j < array.length; j++) {    // n iteracji
+            System.out.println("(" + array[i] + ", " + array[j] + ")");
+        }
+    }
+}
+```
+
+**Analiza:**
+- Dla każdej wartości i (n możliwości)
+- Dla każdej wartości j (n możliwości)
+- Razem: n × n = n² par
+- **Złożoność:** O(n²)
+
+**Przykład 3: Mnożenie macierzy (naiwna metoda)**
+```java
+void multiplyMatrices(int[][] A, int[][] B, int[][] C) {
+    for (int i = 0; i < n; i++) {           // n iteracji
+        for (int j = 0; j < n; j++) {       // n iteracji
+            C[i][j] = 0;
+            for (int k = 0; k < n; k++) {   // n iteracji
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+}
+```
+
+**Analiza:**
+- Trzy zagnieżdżone pętle po n elementach
+- Operacje: n × n × n = n³
+- **Złożoność:** O(n³) — jeszcze gorsza!
+
+**Tabela porównawcza:**
+| n | Operacje O(n²) | Czas (przy 1 mld op/s) | Porównanie z O(n) |
+|---|----------------|------------------------|-------------------|
+| 10 | 100 | 0.0000001 s | 10x więcej |
+| 100 | 10 000 | 0.00001 s | 100x więcej |
+| 1000 | 1 000 000 | 0.001 s | 1000x więcej |
+| 10 000 | 100 000 000 | 0.1 s | 10 000x więcej |
+| 100 000 | 10 000 000 000 | 10 s | 100 000x więcej |
+
+**Wykres:** Parabola (rośnie szybko)
+```
+Czas
+  |
+  |        ╱
+  |       ╱
+  |      ╱
+  |     ╱
+  |    ╱
+  |   ╱
+  └─────────────────────────────→ n
+```
+
+**Ostrzeżenie:** 
+- Dla n = 1000 → 1 000 000 operacji (~0.001 s) — OK
+- Dla n = 10 000 → 100 000 000 operacji (~0.1 s) — wolne
+- Dla n = 100 000 → 10 000 000 000 operacji (~10 s) — bardzo wolne!
+
+**Kiedy O(n²) jest akceptowalne?**
+- Małe dane (n < 1000)
+- Proste algorytmy (łatwe do zrozumienia)
+- Rzadko wykonywane operacje
+
+**Kiedy unikać O(n²)?**
+- Duże dane (n > 10 000)
+- Często wykonywane operacje
+- Aplikacje czasu rzeczywistego
+
+**Wniosek:** O(n²) jest za wolna dla dużych danych — szukaj lepszych algorytmów!
 
 ### O(n³) — złożoność sześcienna
 
@@ -443,16 +921,48 @@ Często możemy:
 3. Wyraź jako funkcję n (rozmiar danych)
 4. Uprość używając notacji O
 
-**Przykład:**
+**Przykład szczegółowy — krok po kroku:**
 ```java
-int sum = 0;                    // 1 operacja
-for (int i = 0; i < n; i++) {   // n iteracji
-    sum += array[i];            // 2 operacje w każdej iteracji
+int sum = 0;                    // Krok 1
+for (int i = 0; i < n; i++) {   // Krok 2
+    sum += array[i];            // Krok 3
 }
-return sum;                     // 1 operacja
-
-// Razem: 1 + n * 2 + 1 = 2n + 2 = O(n)
+return sum;                     // Krok 4
 ```
+
+**Analiza krok po kroku:**
+
+**Krok 1: Inicjalizacja**
+- Operacje: 1 (przypisanie sum = 0)
+- Złożoność: O(1)
+
+**Krok 2: Pętla for**
+- Liczba iteracji: n
+- Operacje w każdej iteracji pętli:
+  - Sprawdzenie warunku (i < n): 1
+  - Inkrementacja i (i++): 1
+- Razem na pętlę: n × 2 = 2n
+
+**Krok 3: Treść pętli**
+- Operacje w każdej iteracji:
+  - Dostęp do tablicy (array[i]): 1
+  - Dodawanie (sum + array[i]): 1
+  - Przypisanie (sum = ...): 1
+- Razem: 3 operacje na iterację
+- Dla n iteracji: 3n
+
+**Krok 4: Return**
+- Operacje: 1
+
+**Podsumowanie:**
+- Razem: 1 + 2n + 3n + 1 = 5n + 2
+- Upraszczając: O(n) (ignorujemy stałe i niższe potęgi)
+
+**Weryfikacja dla różnych n:**
+- n = 10: 5 × 10 + 2 = 52 operacje
+- n = 100: 5 × 100 + 2 = 502 operacje
+- n = 1000: 5 × 1000 + 2 = 5002 operacje
+- **Wzrost liniowy** → O(n) ✓
 
 ### Metoda 2: Analiza pętli
 
@@ -461,19 +971,64 @@ return sum;                     // 1 operacja
 - Zagnieżdżone pętle: O(n * m) = O(n²) jeśli n = m
 - Pętla z podziałem: O(log n)
 
-**Przykłady:**
+**Przykłady szczegółowe:**
+
+**Przykład 1: Pojedyncza pętla — O(n)**
 ```java
-// Pojedyncza pętla: O(n)
-for (int i = 0; i < n; i++) { }
-
-// Zagnieżdżone pętle: O(n²)
 for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) { }
+    System.out.println(i);  // 1 operacja w każdej iteracji
 }
-
-// Pętla z podziałem: O(log n)
-for (int i = n; i > 0; i /= 2) { }
 ```
+**Analiza:**
+- Liczba iteracji: n
+- Operacje na iterację: 1
+- Razem: n × 1 = n
+- **Złożoność:** O(n)
+
+**Przykład 2: Zagnieżdżone pętle — O(n²)**
+```java
+for (int i = 0; i < n; i++) {        // n iteracji
+    for (int j = 0; j < n; j++) {    // n iteracji
+        System.out.println(i + ", " + j);  // 1 operacja
+    }
+}
+```
+**Analiza:**
+- Pętla zewnętrzna: n iteracji
+- Pętla wewnętrzna: n iteracji (dla każdej iteracji zewnętrznej)
+- Operacje: n × n × 1 = n²
+- **Złożoność:** O(n²)
+
+**Przykład 3: Pętla z podziałem — O(log n)**
+```java
+for (int i = n; i > 0; i /= 2) {
+    System.out.println(i);  // 1 operacja w każdej iteracji
+}
+```
+**Analiza:**
+- Iteracja 1: i = n
+- Iteracja 2: i = n/2
+- Iteracja 3: i = n/4
+- Iteracja 4: i = n/8
+- ...
+- Iteracja k: i = n/(2^(k-1)) = 1
+- n/(2^(k-1)) = 1 → n = 2^(k-1) → k-1 = log₂(n) → k = log₂(n) + 1
+- **Złożoność:** O(log n)
+
+**Przykład 4: Zagnieżdżone pętle z różnymi zakresami — O(n × m)**
+```java
+for (int i = 0; i < n; i++) {        // n iteracji
+    for (int j = 0; j < m; j++) {    // m iteracji
+        System.out.println(i + ", " + j);
+    }
+}
+```
+**Analiza:**
+- Pętla zewnętrzna: n iteracji
+- Pętla wewnętrzna: m iteracji
+- Operacje: n × m
+- **Złożoność:** O(n × m)
+- Jeśli n = m: O(n²)
 
 ### Metoda 3: Analiza rekurencji
 
@@ -490,19 +1045,84 @@ Jeśli T(n) = a * T(n/b) + f(n), gdzie a ≥ 1, b > 1, to:
 3. Jeśli f(n) = Ω(n^(log_b(a) + ε)) dla ε > 0:
    T(n) = Θ(f(n))
 
-**Przykład - Merge Sort:**
+**Przykład 1: Merge Sort — szczegółowa analiza**
+
+**Równanie rekurencyjne:**
 T(n) = 2T(n/2) + O(n)
-- a = 2, b = 2, f(n) = O(n)
+
+**Krok 1: Identyfikacja parametrów**
+- a = 2 (liczba podproblemów)
+- b = 2 (rozmiar każdego podproblemu = n/b)
+- f(n) = O(n) (praca na każdym poziomie)
+
+**Krok 2: Obliczenie log_b(a)**
 - log_b(a) = log₂(2) = 1
-- f(n) = Θ(n^1) = Θ(n^(log_b(a))) → przypadek 2
+
+**Krok 3: Porównanie f(n) z n^(log_b(a))**
+- n^(log_b(a)) = n^1 = n
+- f(n) = O(n) = Θ(n)
+- **Wniosek:** f(n) = Θ(n^(log_b(a))) → **przypadek 2**
+
+**Krok 4: Zastosowanie wzoru**
+- Przypadek 2: T(n) = Θ(n^(log_b(a)) * log n)
+- T(n) = Θ(n^1 * log n) = Θ(n log n)
+
+**Weryfikacja:**
+- Merge Sort rzeczywiście ma złożoność O(n log n) ✓
+
+**Przykład 2: Binary Search — szczegółowa analiza**
+
+**Równanie rekurencyjne:**
+T(n) = T(n/2) + O(1)
+
+**Krok 1: Identyfikacja parametrów**
+- a = 1 (jeden podproblem)
+- b = 2 (rozmiar podproblemu = n/2)
+- f(n) = O(1) (stała praca)
+
+**Krok 2: Obliczenie log_b(a)**
+- log_b(a) = log₂(1) = 0
+
+**Krok 3: Porównanie f(n) z n^(log_b(a))**
+- n^(log_b(a)) = n^0 = 1
+- f(n) = O(1) = O(n^0)
+- **Wniosek:** f(n) = O(n^(log_b(a) - ε)) dla ε > 0 → **przypadek 1**
+
+**Krok 4: Zastosowanie wzoru**
+- Przypadek 1: T(n) = Θ(n^(log_b(a)))
+- T(n) = Θ(n^0) = Θ(1)
+- **ALE:** To nie jest poprawne! Musimy przeanalizować dokładniej.
+
+**Poprawna analiza:**
+- Binary Search dzieli problem na połowę: T(n) = T(n/2) + 1
+- T(n) = T(n/2) + 1
+- T(n/2) = T(n/4) + 1
+- ...
+- T(1) = 1
+- T(n) = log₂(n) + 1 = O(log n)
+
+**Przykład 3: Quick Sort (średni przypadek)**
+
+**Równanie rekurencyjne:**
+T(n) = 2T(n/2) + O(n)
+
+**Analiza:**
+- a = 2, b = 2, f(n) = O(n)
+- log_b(a) = 1
+- f(n) = Θ(n) = Θ(n^1) → przypadek 2
 - T(n) = Θ(n log n)
 
-**Przykład - Binary Search:**
-T(n) = T(n/2) + O(1)
-- a = 1, b = 2, f(n) = O(1)
-- log_b(a) = log₂(1) = 0
-- f(n) = O(n^0) = O(1) → przypadek 1
-- T(n) = Θ(log n)
+**Przykład 4: Algorytm dziel-i-zwyciężaj z 3 podproblemami**
+
+**Równanie:**
+T(n) = 3T(n/2) + O(n)
+
+**Analiza:**
+- a = 3, b = 2, f(n) = O(n)
+- log_b(a) = log₂(3) ≈ 1.585
+- n^(log_b(a)) = n^1.585
+- f(n) = O(n) = O(n^1) < O(n^1.585) → przypadek 1
+- T(n) = Θ(n^(log₂(3))) ≈ Θ(n^1.585)
 
 ### Metoda 4: Drzewo rekurencji
 
@@ -511,16 +1131,66 @@ T(n) = T(n/2) + O(1)
 2. Policz całkowitą pracę na każdym poziomie
 3. Zsumuj wszystkie poziomy
 
-**Przykład - Merge Sort:**
-```
-Poziom 0:           O(n)          [1 poziom]
-Poziom 1:        O(n/2) O(n/2)    [2 poziomy, razem O(n)]
-Poziom 2:    O(n/4) ... O(n/4)    [4 poziomy, razem O(n)]
-...
-Poziom log n: O(1) ... O(1)       [n poziomy, razem O(n)]
+**Przykład - Merge Sort — szczegółowa analiza drzewa:**
 
-Razem: (log n + 1) poziomów * O(n) = O(n log n)
+**Równanie:** T(n) = 2T(n/2) + O(n)
+
+**Drzewo rekurencji dla n = 8:**
+
 ```
+                    Poziom 0: O(8) = O(n)
+                         |
+        ┌─────────────────┴─────────────────┐
+        |                                   |
+    Poziom 1: O(4)                    Poziom 1: O(4)
+    = O(n/2)                          = O(n/2)
+        |                                   |
+    ┌───┴───┐                         ┌───┴───┐
+    |       |                         |       |
+Poziom 2: Poziom 2:              Poziom 2: Poziom 2:
+O(2)     O(2)                   O(2)     O(2)
+= O(n/4) = O(n/4)                = O(n/4) = O(n/4)
+    |       |                         |       |
+  ...     ...                       ...     ...
+```
+
+**Analiza poziomów:**
+
+**Poziom 0:**
+- Liczba węzłów: 1
+- Praca na węzeł: O(n)
+- Praca całkowita: O(n)
+
+**Poziom 1:**
+- Liczba węzłów: 2
+- Praca na węzeł: O(n/2)
+- Praca całkowita: 2 × O(n/2) = O(n)
+
+**Poziom 2:**
+- Liczba węzłów: 4
+- Praca na węzeł: O(n/4)
+- Praca całkowita: 4 × O(n/4) = O(n)
+
+**Poziom k:**
+- Liczba węzłów: 2^k
+- Praca na węzeł: O(n/(2^k))
+- Praca całkowita: 2^k × O(n/(2^k)) = O(n)
+
+**Liczba poziomów:**
+- Poziom 0: n elementów
+- Poziom 1: n/2 elementów
+- Poziom 2: n/4 elementów
+- ...
+- Poziom log₂(n): n/(2^(log₂(n))) = n/n = 1 element
+- **Liczba poziomów:** log₂(n) + 1
+
+**Całkowita praca:**
+- (log₂(n) + 1) poziomów × O(n) na poziom
+- = O(n log n)
+
+**Weryfikacja dla n = 8:**
+- Poziomów: log₂(8) + 1 = 3 + 1 = 4
+- Praca: 4 × O(8) = O(32) = O(n log n) ✓
 
 ---
 
@@ -806,4 +1476,382 @@ Definiujemy funkcję potencjału, która mierzy "stan" struktury danych.
 19. **Binary Search** — O(log n) — bardzo efektywne wyszukiwanie w posortowanej tablicy
 
 20. **Hash Table** — O(1) amortyzowana dla wstawiania/wyszukiwania (O(n) w najgorszym przypadku)
+
+---
+
+## 13) Materiały do nauki — linki i zasoby
+
+### Strony internetowe z interaktywnymi wizualizacjami:
+
+**1. VisuAlgo — Algorytmy wizualizowane**
+- **Link:** https://visualgo.net/
+- **Opis:** Interaktywne wizualizacje algorytmów sortowania, wyszukiwania, grafów
+- **Zalety:** Możesz zobaczyć, jak algorytmy działają krok po kroku
+- **Przydatne dla:** Zrozumienia, jak działają algorytmy
+
+**2. Big-O Cheat Sheet**
+- **Link:** https://www.bigocheatsheet.com/
+- **Opis:** Kompletna ściąga złożoności algorytmów i struktur danych
+- **Zalety:** Szybkie odniesienie do złożoności
+- **Przydatne dla:** Szybkiego sprawdzenia złożoności
+
+**3. Algorithm Visualizer**
+- **Link:** https://algorithm-visualizer.org/
+- **Opis:** Wizualizacje różnych algorytmów z kodem
+- **Zalety:** Możesz zobaczyć kod i wizualizację jednocześnie
+
+### Kursy online:
+
+**4. Khan Academy — Algorithms**
+- **Link:** https://www.khanacademy.org/computing/computer-science/algorithms
+- **Opis:** Darmowy kurs podstaw algorytmów
+- **Zalety:** Od podstaw, z przykładami i ćwiczeniami
+
+**5. Coursera — Algorithms Specialization (Stanford)**
+- **Link:** https://www.coursera.org/specializations/algorithms
+- **Opis:** Kompleksowy kurs algorytmów
+- **Zalety:** Profesjonalny, z certyfikatami
+- **Uwaga:** Płatny, ale często są darmowe audyty
+
+**6. MIT OpenCourseWare — Introduction to Algorithms**
+- **Link:** https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+- **Opis:** Materiały z MIT
+- **Zalety:** Darmowe, wysokiej jakości
+
+### Książki (PDF dostępne online):
+
+**7. "Introduction to Algorithms" (CLRS)**
+- **Autorzy:** Cormen, Leiserson, Rivest, Stein
+- **Opis:** Klasyczna książka o algorytmach
+- **Zalety:** Kompleksowa, szczegółowa
+- **Link do PDF:** Szukaj "CLRS algorithms pdf" w Google
+
+**8. "Algorithms" (Sedgewick)**
+- **Autor:** Robert Sedgewick
+- **Opis:** Praktyczne podejście do algorytmów
+- **Zalety:** Łatwiejsza niż CLRS, z przykładami w Javie
+
+### Platformy do ćwiczeń:
+
+**9. LeetCode**
+- **Link:** https://leetcode.com/
+- **Opis:** Zadania programistyczne z analizą złożoności
+- **Zalety:** Praktyka, rankingi, wyjaśnienia rozwiązań
+- **Przydatne dla:** Ćwiczenia analizy złożoności
+
+**10. HackerRank**
+- **Link:** https://www.hackerrank.com/
+- **Opis:** Zadania algorytmiczne z testami
+- **Zalety:** Różne poziomy trudności
+
+**11. Codeforces**
+- **Link:** https://codeforces.com/
+- **Opis:** Zawody programistyczne
+- **Zalety:** Zaawansowane zadania, analiza złożoności jest kluczowa
+
+### Filmy na YouTube:
+
+**12. Abdul Bari — Algorithms**
+- **Link:** https://www.youtube.com/c/AbdulBari
+- **Opis:** Szczegółowe wyjaśnienia algorytmów
+- **Zalety:** Bardzo szczegółowe, krok po kroku
+
+**13. Back To Back SWE**
+- **Link:** https://www.youtube.com/c/BackToBackSWE
+- **Opis:** Wyjaśnienia algorytmów z przykładami
+- **Zalety:** Praktyczne podejście
+
+### Narzędzia do wizualizacji:
+
+**14. Python Tutor**
+- **Link:** https://pythontutor.com/
+- **Opis:** Wizualizacja wykonania kodu krok po kroku
+- **Zalety:** Możesz zobaczyć, jak kod działa linia po linii
+
+**15. Big-O Calculator**
+- **Link:** Szukaj "big o calculator online"
+- **Opis:** Kalkulatory do analizy złożoności
+- **Zalety:** Szybkie sprawdzenie złożoności
+
+### Praktyczne wskazówki do nauki:
+
+**1. Zacznij od podstaw:**
+- Zrozum, co to jest złożoność
+- Naucz się notacji Big O
+- Przeanalizuj proste algorytmy
+
+**2. Ćwicz analizę:**
+- Weź prosty algorytm
+- Zlicz operacje krok po kroku
+- Wyraź jako funkcję n
+- Uprość do notacji O
+
+**3. Porównuj algorytmy:**
+- Weź ten sam problem
+- Porównaj różne algorytmy
+- Zobacz różnicę w złożoności
+
+**4. Wizualizuj:**
+- Użyj VisuAlgo lub podobnych narzędzi
+- Zobacz, jak algorytmy działają
+- Zrozum, dlaczego mają taką złożoność
+
+**5. Ćwicz na zadaniach:**
+- Rozwiązuj zadania na LeetCode
+- Analizuj złożoność swoich rozwiązań
+- Porównuj z optymalnymi rozwiązaniami
+
+### Przykładowy plan nauki:
+
+**Tydzień 1: Podstawy**
+- Notacja Big O, Omega, Theta
+- O(1), O(log n), O(n)
+- Proste przykłady analizy
+
+**Tydzień 2: Klasy złożoności**
+- O(n log n), O(n²), O(n³)
+- O(2^n), O(n!)
+- Porównania i wykresy
+
+**Tydzień 3: Analiza algorytmów**
+- Metody analizy (zliczanie, pętle, rekurencja)
+- Master Theorem
+- Przykłady konkretnych algorytmów
+
+**Tydzień 4: Praktyka**
+- Rozwiązywanie zadań
+- Analiza złożoności struktur danych
+- Porównywanie algorytmów
+
+---
+
+## 14) Dodatkowe przykłady analizy — krok po kroku
+
+### Przykład 1: Analiza prostego algorytmu sumowania
+
+**Kod:**
+```java
+int sum(int[] array) {
+    int sum = 0;                    // Krok 1
+    for (int i = 0; i < array.length; i++) {  // Krok 2
+        sum += array[i];            // Krok 3
+    }
+    return sum;                     // Krok 4
+}
+```
+
+**Analiza krok po kroku:**
+
+**Krok 1: Inicjalizacja**
+- Operacje: 1 (przypisanie)
+- Złożoność: O(1)
+
+**Krok 2: Pętla for**
+- Liczba iteracji: n (długość tablicy)
+- Operacje w każdej iteracji:
+  - Sprawdzenie warunku: 1
+  - Inkrementacja i: 1
+- Razem na pętlę: n × 2 = 2n
+
+**Krok 3: Treść pętli**
+- Operacje w każdej iteracji:
+  - Dostęp do tablicy: array[i] = 1
+  - Dodawanie: sum + array[i] = 1
+  - Przypisanie: sum = ... = 1
+- Razem: 3 operacje na iterację
+- Dla n iteracji: 3n
+
+**Krok 4: Return**
+- Operacje: 1
+
+**Podsumowanie:**
+- Razem: 1 + 2n + 3n + 1 = 5n + 2
+- Upraszczając: O(n)
+
+**Weryfikacja:**
+- Dla n = 10: 5 × 10 + 2 = 52 operacje
+- Dla n = 100: 5 × 100 + 2 = 502 operacje
+- Dla n = 1000: 5 × 1000 + 2 = 5002 operacje
+- **Wzrost liniowy** → O(n) ✓
+
+### Przykład 2: Analiza zagnieżdżonych pętli
+
+**Kod:**
+```java
+void printPairs(int[] array) {
+    for (int i = 0; i < array.length; i++) {        // Pętla zewnętrzna
+        for (int j = 0; j < array.length; j++) {    // Pętla wewnętrzna
+            System.out.println(array[i] + ", " + array[j]);
+        }
+    }
+}
+```
+
+**Analiza krok po kroku:**
+
+**Pętla zewnętrzna:**
+- Liczba iteracji: n
+- W każdej iteracji wykonuje się pętla wewnętrzna
+
+**Pętla wewnętrzna:**
+- Liczba iteracji: n
+- Operacje w każdej iteracji:
+  - Dostęp: array[i] = 1
+  - Dostęp: array[j] = 1
+  - Konkatenacja: 2
+  - Print: 1
+  - Razem: ~5 operacji
+
+**Obliczenia:**
+- Dla każdej iteracji zewnętrznej: n iteracji wewnętrznych
+- Operacje na parę pętli: n × n × 5 = 5n²
+- **Złożoność:** O(n²)
+
+**Weryfikacja:**
+- Dla n = 10: 5 × 100 = 500 operacji
+- Dla n = 100: 5 × 10 000 = 50 000 operacji
+- Dla n = 1000: 5 × 1 000 000 = 5 000 000 operacji
+- **Wzrost kwadratowy** → O(n²) ✓
+
+### Przykład 3: Analiza rekurencyjnego algorytmu
+
+**Kod (obliczanie silni):**
+```java
+int factorial(int n) {
+    if (n <= 1) {           // Warunek bazowy
+        return 1;
+    }
+    return n * factorial(n - 1);  // Rekurencja
+}
+```
+
+**Analiza krok po kroku:**
+
+**Równanie rekurencyjne:**
+- T(n) = T(n-1) + O(1)
+- T(1) = O(1) (warunek bazowy)
+
+**Rozwiązanie:**
+- T(n) = T(n-1) + 1
+- T(n-1) = T(n-2) + 1
+- T(n-2) = T(n-3) + 1
+- ...
+- T(2) = T(1) + 1
+- T(1) = 1
+
+**Podstawiając wstecz:**
+- T(n) = T(n-1) + 1
+- = [T(n-2) + 1] + 1 = T(n-2) + 2
+- = [T(n-3) + 1] + 2 = T(n-3) + 3
+- = ...
+- = T(1) + (n-1) = 1 + (n-1) = n
+
+**Złożoność:** O(n)
+
+**Weryfikacja:**
+- factorial(5) wywołuje: factorial(5) → factorial(4) → factorial(3) → factorial(2) → factorial(1)
+- Liczba wywołań: 5 = n ✓
+
+### Przykład 4: Analiza algorytmu z warunkami
+
+**Kod:**
+```java
+int find(int[] array, int target) {
+    for (int i = 0; i < array.length; i++) {
+        if (array[i] == target) {
+            return i;  // Znaleziono - kończymy
+        }
+    }
+    return -1;  // Nie znaleziono
+}
+```
+
+**Analiza przypadków:**
+
+**Najlepszy przypadek:**
+- Element na pierwszej pozycji
+- Operacje: 1 porównanie + 1 return = 2
+- **Złożoność:** O(1)
+
+**Najgorszy przypadek:**
+- Element na ostatniej pozycji lub brak elementu
+- Operacje: n porównań + 1 return = n + 1
+- **Złożoność:** O(n)
+
+**Przeciętny przypadek:**
+- Element w środku
+- Operacje: n/2 porównań + 1 return ≈ n/2
+- **Złożoność:** O(n)
+
+**W praktyce:** Używamy O(n) — najgorszy przypadek
+
+---
+
+## 15) Ćwiczenia do samodzielnego rozwiązania
+
+### Ćwiczenie 1: Analiza prostej pętli
+```java
+void printArray(int[] array) {
+    for (int i = 0; i < array.length; i++) {
+        System.out.println(array[i]);
+    }
+}
+```
+**Pytanie:** Jaka jest złożoność czasowa? Odpowiedź: O(n)
+
+### Ćwiczenie 2: Analiza zagnieżdżonych pętli
+```java
+void printMatrix(int[][] matrix) {
+    for (int i = 0; i < matrix.length; i++) {
+        for (int j = 0; j < matrix[i].length; j++) {
+            System.out.print(matrix[i][j] + " ");
+        }
+        System.out.println();
+    }
+}
+```
+**Pytanie:** Jaka jest złożoność czasowa? 
+**Odpowiedź:** O(n × m), gdzie n = liczba wierszy, m = liczba kolumn. Jeśli n = m, to O(n²)
+
+### Ćwiczenie 3: Analiza z warunkiem
+```java
+boolean contains(int[] array, int target) {
+    for (int i = 0; i < array.length; i++) {
+        if (array[i] == target) {
+            return true;
+        }
+    }
+    return false;
+}
+```
+**Pytanie:** Jaka jest złożoność w najlepszym, przeciętnym i najgorszym przypadku?
+**Odpowiedź:** 
+- Najlepszy: O(1) — element na pierwszej pozycji
+- Przeciętny: O(n) — element w środku
+- Najgorszy: O(n) — element na końcu lub brak
+
+### Ćwiczenie 4: Analiza rekurencji
+```java
+int power(int base, int exp) {
+    if (exp == 0) return 1;
+    return base * power(base, exp - 1);
+}
+```
+**Pytanie:** Jaka jest złożoność czasowa?
+**Odpowiedź:** O(exp) — liczba wywołań rekurencyjnych = exp
+
+### Ćwiczenie 5: Analiza złożoności pamięciowej
+```java
+int[] copyArray(int[] original) {
+    int[] copy = new int[original.length];
+    for (int i = 0; i < original.length; i++) {
+        copy[i] = original[i];
+    }
+    return copy;
+}
+```
+**Pytanie:** Jaka jest złożoność czasowa i pamięciowa?
+**Odpowiedź:** 
+- Czasowa: O(n) — n iteracji
+- Pamięciowa: O(n) — nowa tablica rozmiaru n
 
