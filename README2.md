@@ -476,22 +476,221 @@ Dzielenie:
 
 **Uwaga:** Dzielenie przez zero powoduje błąd! Trzeba sprawdzić czy N2 ≠ 0.
 
-### Zalety stałoprzecinkowej:
-- ✅ **Deterministyczna** — zawsze ta sama precyzja
-- ✅ **Szybka** — operacje na liczbach całkowitych
-- ✅ **Przewidywalna** — brak niespodzianek z precyzją
-- ✅ **Dobra dla aplikacji czasu rzeczywistego**
+### Zalety stałoprzecinkowej — szczegółowo:
 
-### Wady stałoprzecinkowej:
-- ❌ **Ograniczony zakres** — zależy od liczby bitów
-- ❌ **Stała precyzja** — nie można zmienić dokładności
-- ❌ **Trudność w implementacji** — trzeba ręcznie zarządzać formatem
+**1. Determinizm — zawsze ta sama precyzja**
+- **Co to znaczy:** Każda liczba ma dokładnie taką samą precyzję (np. zawsze 5 bitów ułamkowych = precyzja 1/32)
+- **Przykład:** Format Q3.5 zawsze ma precyzję 0.03125
+- **Korzyść:** Przewidywalne zachowanie — wiesz dokładnie, jaka jest precyzja
 
-### Zastosowania:
-- Systemy wbudowane (embedded systems)
-- Przetwarzanie sygnałów cyfrowych (DSP)
-- Aplikacje finansowe (gdzie potrzebna jest deterministyczna precyzja)
-- Grafika komputerowa (niektóre algorytmy)
+**2. Szybkość — operacje na liczbach całkowitych**
+- **Co to znaczy:** Komputer wykonuje operacje na liczbach całkowitych (szybkie!)
+- **Porównanie:** 
+  - Stałoprzecinkowa: 80 + 40 = 120 (jedna operacja całkowita)
+  - Zmiennoprzecinkowa: wymaga wyrównania wykładników, normalizacji, zaokrąglenia (wiele operacji)
+- **Korzyść:** Szybsze wykonanie, szczególnie w systemach wbudowanych
+
+**3. Przewidywalność — brak niespodzianek**
+- **Co to znaczy:** Nie ma "magicznych" zaokrągleń, które mogą się zmieniać
+- **Przykład:** 0.1 + 0.1 zawsze da ten sam wynik w stałoprzecinkowej
+- **Korzyść:** Łatwiejsze debugowanie, brak ukrytych błędów
+
+**4. Aplikacje czasu rzeczywistego**
+- **Co to znaczy:** System musi reagować w określonym czasie
+- **Przykład:** System hamulcowy w samochodzie — musi działać w < 10ms
+- **Korzyść:** Deterministyczny czas wykonania — zawsze wiesz, ile zajmie
+
+### Wady stałoprzecinkowej — szczegółowo:
+
+**1. Ograniczony zakres — zależy od liczby bitów**
+- **Problem:** Format Q3.5 może reprezentować tylko liczby od -8 do ~7.96875
+- **Przykład:** Nie możesz zapisać 100.5 w formacie Q3.5 (za duże!)
+- **Rozwiązanie:** Musisz wybrać format odpowiedni do zakresu danych
+
+**2. Stała precyzja — nie można zmienić dokładności**
+- **Problem:** Jeśli potrzebujesz większej precyzji, musisz zmienić format całego systemu
+- **Przykład:** Format Q3.5 ma precyzję 0.03125 — nie możesz nagle mieć precyzji 0.0001
+- **Rozwiązanie:** Wybierz format z odpowiednią precyzją na początku
+
+**3. Trudność w implementacji — ręczne zarządzanie formatem**
+- **Problem:** Musisz ręcznie:
+  - Wybierać format (Qm.n)
+  - Zarządzać przesunięciami bitowymi
+  - Sprawdzać przepełnienia
+  - Normalizować różne formaty
+- **Przykład:** Mnożenie wymaga przesunięcia bitowego — łatwo o błąd
+- **Rozwiązanie:** Użyj bibliotek lub gotowych typów
+
+### Zastosowania stałoprzecinkowej — szczegółowe przykłady:
+
+**1. Systemy wbudowane (embedded systems)**
+- **Przykład:** Mikrokontrolery w samochodach, robotach, urządzeniach medycznych
+- **Dlaczego:** 
+  - Ograniczone zasoby (mało pamięci, wolny procesor)
+  - Potrzebna deterministyczna precyzja
+  - Szybkie operacje są kluczowe
+- **Przykład kodu (pseudokod):**
+```
+// Format Q7.8 (15 bitów, precyzja 1/256)
+int temperature = 2500;  // 25.00°C * 100 = 2500
+int threshold = 3000;    // 30.00°C * 100 = 3000
+
+if (temperature > threshold) {
+    turnOnCooling();
+}
+```
+
+**2. Przetwarzanie sygnałów cyfrowych (DSP)**
+- **Przykład:** Filtry audio, kompresja dźwięku, przetwarzanie obrazów
+- **Dlaczego:**
+  - Wysoka częstotliwość próbkowania (tysiące operacji na sekundę)
+  - Potrzebna szybkość
+  - Precyzja jest wystarczająca (np. 16-bit audio)
+- **Przykład:** Filtrowanie sygnału audio
+  - Format Q15.16 (31 bitów)
+  - Próbkowanie: 44100 Hz
+  - Każda próbka wymaga obliczeń w czasie rzeczywistym
+
+**3. Aplikacje finansowe**
+- **Przykład:** Systemy bankowe, giełda, kalkulatory finansowe
+- **Dlaczego:**
+  - Potrzebna deterministyczna precyzja (pieniądze muszą się zgadzać!)
+  - Brak błędów zaokrąglenia, które mogą się kumulować
+  - Przewidywalne obliczenia
+- **Przykład:** Obliczanie odsetek
+  - Format Q15.16 dla kwot (precyzja do grosza)
+  - Format Q7.8 dla stóp procentowych (precyzja 0.01%)
+
+**4. Grafika komputerowa (niektóre algorytmy)**
+- **Przykład:** Przetwarzanie pikseli, transformacje 2D/3D
+- **Dlaczego:**
+  - Szybkość jest kluczowa (60 FPS = 16ms na klatkę)
+  - Precyzja wystarczająca dla pikseli
+- **Przykład:** Przeskalowanie obrazu
+  - Format Q8.8 dla współrzędnych pikseli
+  - Szybkie obliczenia całkowite
+
+### Praktyczne przykłady implementacji stałoprzecinkowej:
+
+**Przykład 1: Przechowywanie ceny w groszach**
+
+**Problem:** Chcesz przechowywać ceny produktów z precyzją do grosza.
+
+**Rozwiązanie stałoprzecinkowe:**
+```java
+// Format: cena w groszach (dzielimy przez 100)
+int priceInGrosze = 1250;  // 12.50 zł
+
+// Operacje:
+int price1 = 1250;  // 12.50 zł
+int price2 = 750;   // 7.50 zł
+int sum = price1 + price2;  // 2000 groszy = 20.00 zł ✓
+
+// Mnożenie (uwaga na precyzję!):
+int quantity = 3;
+int total = (price1 * quantity) / 100;  // (1250 * 3) / 100 = 3750 / 100 = 37.50 zł
+// Ale lepiej: total = price1 * quantity; // 3750 groszy = 37.50 zł
+```
+
+**Przykład 2: Przetwarzanie sygnału audio**
+
+**Problem:** Przetwarzasz sygnał audio z precyzją 16-bit.
+
+**Rozwiązanie stałoprzecinkowe:**
+```java
+// Format Q15.16 (31 bitów, precyzja 1/65536)
+// Próbka audio: zakres -32768 do 32767
+
+int sample1 = 16384;  // 0.25 w zakresie [-1.0, 1.0]
+int sample2 = -8192; // -0.125 w zakresie [-1.0, 1.0]
+
+// Mieszanie sygnałów (50% każdego):
+int mixed = (sample1 + sample2) / 2;  // (16384 - 8192) / 2 = 4096
+```
+
+**Przykład 3: Obliczenia fizyczne w grze**
+
+**Problem:** Symulujesz fizykę w grze 2D, potrzebujesz szybkich obliczeń.
+
+**Rozwiązanie stałoprzecinkowe:**
+```java
+// Format Q12.4 (16 bitów) dla pozycji
+// Precyzja: 1/16 = 0.0625 jednostek
+
+int playerX = 160;  // 10.0 jednostek (160 / 16)
+int playerY = 240;  // 15.0 jednostek (240 / 16)
+
+// Ruch:
+int speedX = 8;     // 0.5 jednostek/klatka (8 / 16)
+playerX += speedX;  // 160 + 8 = 168 (10.5 jednostek)
+```
+
+### Porównanie formatów stałoprzecinkowych:
+
+| Format | Bity całkowite | Bity ułamkowe | Zakres (bez znaku) | Precyzja | Przykład |
+|--------|----------------|---------------|-------------------|----------|----------|
+| **Q3.5** | 3 | 5 | 0-7.96875 | 0.03125 | 3.34375 |
+| **Q7.8** | 7 | 8 | 0-127.996 | 0.00390625 | 25.5 |
+| **Q15.16** | 15 | 16 | 0-32767.99998 | 0.00001526 | 1000.5 |
+| **Q31.0** | 31 | 0 | 0-2147483647 | 1.0 | Tylko całkowite |
+
+**Wybór formatu:**
+- **Q3.5:** Małe liczby, niska precyzja (np. temperatury w °C)
+- **Q7.8:** Średnie liczby, średnia precyzja (np. współrzędne 2D)
+- **Q15.16:** Duże liczby, wysoka precyzja (np. sygnały audio)
+- **Q31.0:** Tylko liczby całkowite (jak int)
+
+### Problemy i rozwiązania w stałoprzecinkowej:
+
+**Problem 1: Przepełnienie przy mnożeniu**
+
+**Przykład:**
+```java
+// Format Q3.5 (8 bitów, zakres -8 do ~7.97)
+int a = 100;  // 3.125 (100 / 32)
+int b = 120;  // 3.75 (120 / 32)
+int result = a * b;  // 100 * 120 = 12000
+// Problem: 12000 > 255 (maksymalna wartość dla 8 bitów)!
+```
+
+**Rozwiązanie:**
+- Użyj większego formatu (np. Q7.8 zamiast Q3.5)
+- Sprawdź przed mnożeniem, czy wynik się zmieści
+- Użyj 64-bitowych wartości pośrednich
+
+**Problem 2: Utrata precyzji przy dzieleniu**
+
+**Przykład:**
+```java
+// Format Q3.5
+int a = 100;  // 3.125
+int b = 3;    // 0.09375
+int result = a / b;  // 100 / 3 = 33 (dzielenie całkowite)
+// Rzeczywista wartość: 33 / 32 = 1.03125
+// Prawidłowa wartość: 3.125 / 0.09375 = 33.33...
+// Utrata precyzji!
+```
+
+**Rozwiązanie:**
+- Przesuń dzielną w lewo przed dzieleniem (zwiększ precyzję)
+- Użyj większego formatu dla wyniku
+
+**Problem 3: Różne formaty w jednym systemie**
+
+**Przykład:**
+```java
+// Format Q3.5
+int temperature = 100;  // 3.125°C
+
+// Format Q7.8 (inny format!)
+int pressure = 25600;    // 100.0 Pa
+
+// Problem: Nie można bezpośrednio dodać!
+```
+
+**Rozwiązanie:**
+- Znormalizuj do wspólnego formatu przed operacjami
+- Użyj jednego formatu w całym systemie (jeśli możliwe)
 
 ---
 
@@ -649,23 +848,155 @@ Gdzie:
 - M = M_bin / (2^52)
 - E — wykładnik (0-2047, z bias 1023)
 
-### Zakresy i precyzja
+### Zakresy i precyzja — szczegółowa analiza
 
-#### Float (32-bit):
-- Najmniejsza wartość dodatnia (zdenormalizowana): ≈ 1.4 × 10^(-45)
-- Najmniejsza wartość znormalizowana: ≈ 1.2 × 10^(-38)
-- Największa wartość: ≈ 3.4 × 10^38
-- Precyzja: ~7 cyfr dziesiętnych (23 bity mantysy ≈ 2^23 ≈ 8.4 × 10^6)
+#### Float (32-bit) — szczegółowe wartości:
 
-#### Double (64-bit):
-- Najmniejsza wartość dodatnia (zdenormalizowana): ≈ 4.9 × 10^(-324)
-- Najmniejsza wartość znormalizowana: ≈ 2.2 × 10^(-308)
-- Największa wartość: ≈ 1.8 × 10^308
-- Precyzja: ~15-17 cyfr dziesiętnych (52 bity mantysy ≈ 2^52 ≈ 4.5 × 10^15)
+**Struktura:**
+- 1 bit znaku
+- 8 bitów wykładnika (bias 127)
+- 23 bity mantysy
 
-### Wzór na liczbę możliwych wartości:
-Dla mantysy o p bitach (bez ukrytej jedynki):
+**Zakres wartości:**
+
+**Najmniejsza wartość dodatnia (zdenormalizowana):**
+- E = 0, M = 1 (najmniejsza niezerowa)
+- V = 1 × 2^(-126) ≈ 1.4 × 10^(-45)
+- **Co to znaczy:** Najmniejsza liczba, jaką można reprezentować
+
+**Najmniejsza wartość znormalizowana:**
+- E = 1, M = 0 (najmniejsza znormalizowana)
+- V = 1.0 × 2^(-126) ≈ 1.2 × 10^(-38)
+- **Co to znaczy:** Najmniejsza "normalna" liczba
+
+**Największa wartość:**
+- E = 254 (nie 255, bo 255 to Infinity), M = wszystkie jedynki
+- V = (1 + (2^23 - 1)/2^23) × 2^127 ≈ 3.4 × 10^38
+- **Co to znaczy:** Największa liczba przed nieskończonością
+
+**Precyzja:**
+- 23 bity mantysy = 2^23 ≈ 8 388 608 możliwych wartości mantysy
+- **Oznacza to:** Możesz rozróżnić ~8.4 miliona różnych wartości
+- **W praktyce:** ~7 cyfr dziesiętnych precyzji
+- **Przykład:** 1234567.89 może być reprezentowane jako 1234567 lub 1234568 (utrata precyzji)
+
+**Przykłady wartości float:**
+- 0.0 — zero
+- 1.0 — jeden
+- 3.14159 — pi (z przybliżeniem)
+- 1000000.0 — milion
+- 0.000001 — jedna milionowa
+- 3.4028235E+38 — maksymalna wartość
+
+#### Double (64-bit) — szczegółowe wartości:
+
+**Struktura:**
+- 1 bit znaku
+- 11 bitów wykładnika (bias 1023)
+- 52 bity mantysy
+
+**Zakres wartości:**
+
+**Najmniejsza wartość dodatnia (zdenormalizowana):**
+- E = 0, M = 1
+- V = 1 × 2^(-1022) ≈ 4.9 × 10^(-324)
+- **Co to znaczy:** Ekstremalnie mała liczba
+
+**Najmniejsza wartość znormalizowana:**
+- E = 1, M = 0
+- V = 1.0 × 2^(-1022) ≈ 2.2 × 10^(-308)
+
+**Największa wartość:**
+- E = 2046, M = wszystkie jedynki
+- V ≈ 1.8 × 10^308
+- **Co to znaczy:** Ogromna liczba (więcej niż atomy we wszechświecie!)
+
+**Precyzja:**
+- 52 bity mantysy = 2^52 ≈ 4.5 × 10^15 możliwych wartości
+- **Oznacza to:** Możesz rozróżnić ~4.5 biliarda różnych wartości
+- **W praktyce:** ~15-17 cyfr dziesiętnych precyzji
+- **Przykład:** 123456789012345.67 może być reprezentowane z dużą precyzją
+
+**Przykłady wartości double:**
+- 0.0 — zero
+- 1.0 — jeden
+- 3.141592653589793 — pi (wysoka precyzja)
+- 1000000000000.0 — bilion
+- 0.0000000000001 — jedna bilionowa
+- 1.7976931348623157E+308 — maksymalna wartość
+
+### Porównanie Float vs Double — kiedy używać którego?
+
+**Kiedy używać Float (32-bit):**
+- ✅ Oszczędność pamięci (2x mniej niż double)
+- ✅ Szybsze obliczenia (mniej bitów do przetworzenia)
+- ✅ Wystarczająca precyzja dla większości zastosowań
+- ✅ Grafika komputerowa (współrzędne, kolory)
+- ✅ Przetwarzanie sygnałów (audio, wideo)
+- ✅ Aplikacje mobilne (oszczędność pamięci)
+
+**Przykład użycia float:**
+```java
+// Grafika 3D - współrzędne punktów
+float x = 1.5f;
+float y = 2.3f;
+float z = 0.8f;
+
+// Precyzja wystarczająca dla pikseli
+// Oszczędność pamięci (3 × 4 bajty = 12 bajtów zamiast 24)
+```
+
+**Kiedy używać Double (64-bit):**
+- ✅ Wysoka precyzja jest kluczowa
+- ✅ Obliczenia naukowe (fizyka, chemia, matematyka)
+- ✅ Finanse (gdy potrzebna wysoka precyzja)
+- ✅ Obliczenia inżynierskie
+- ✅ Gdy błędy zaokrąglenia mogą się kumulować
+
+**Przykład użycia double:**
+```java
+// Obliczenia naukowe - wysoka precyzja
+double pi = 3.141592653589793;
+double e = 2.718281828459045;
+
+// Obliczenia wymagające dużej precyzji
+double result = Math.sin(pi / 2);  // Powinno być 1.0
+```
+
+**Tabela porównawcza:**
+
+| Aspekt | Float (32-bit) | Double (64-bit) |
+|--------|----------------|-----------------|
+| **Rozmiar** | 4 bajty | 8 bajtów |
+| **Precyzja** | ~7 cyfr | ~15-17 cyfr |
+| **Zakres** | ±3.4 × 10^38 | ±1.8 × 10^308 |
+| **Szybkość** | Szybszy | Wolniejszy |
+| **Pamięć** | Mniej | Więcej |
+| **Zastosowania** | Grafika, audio, mobilne | Nauka, inżynieria, finanse |
+
+### Wzór na liczbę możliwych wartości — szczegółowa analiza:
+
+**Dla mantysy o p bitach (bez ukrytej jedynki):**
 liczby możliwe = 2^(p+1)
+
+**Wyjaśnienie:**
+- p bitów mantysy → 2^p możliwych wartości mantysy
+- +1 (ukryta jedynka) → 2^(p+1) możliwych wartości mantysy
+- × 2 (dodatnia/ujemna) → 2 × 2^(p+1) = 2^(p+2) możliwych liczb (dla każdego wykładnika)
+
+**Przykłady:**
+
+**Float (p = 23):**
+- Możliwe wartości mantysy: 2^24 = 16 777 216
+- Dla każdego wykładnika (254 możliwe wartości znormalizowane)
+- Razem: ~4.2 miliarda różnych liczb znormalizowanych
+
+**Double (p = 52):**
+- Możliwe wartości mantysy: 2^53 = 9 007 199 254 740 992
+- Dla każdego wykładnika (2046 możliwe wartości znormalizowane)
+- Razem: ~18.4 × 10^18 różnych liczb znormalizowanych
+
+**Wniosek:** Double ma znacznie więcej możliwych wartości niż float!
 
 ### Przykład konwersji: Float → Wartość dziesiętna — szczegółowo
 
@@ -1046,7 +1377,31 @@ for (int i = 0; i < 1000; i++) {
 
 ## 6) Problemy i pułapki
 
-### 1. Porównywanie liczb zmiennoprzecinkowych
+### 1. Porównywanie liczb zmiennoprzecinkowych — szczegółowo
+
+**Problem:** Liczby zmiennoprzecinkowe mają błędy zaokrąglenia, więc rzadko są dokładnie równe.
+
+**Przykład problemu:**
+```java
+double a = 0.1 + 0.2;
+double b = 0.3;
+
+if (a == b) {
+    System.out.println("Równe!");
+} else {
+    System.out.println("Nie równe!");  // To się wyświetli!
+}
+
+System.out.println("a = " + a);  // a = 0.30000000000000004
+System.out.println("b = " + b);  // b = 0.3
+```
+
+**Dlaczego?**
+- 0.1 w binarnym = 0.00011001100110011... (nieskończone)
+- 0.2 w binarnym = 0.0011001100110011... (nieskończone)
+- 0.1 + 0.2 = 0.30000000000000004 (błąd zaokrąglenia!)
+
+**Rozwiązanie 1: Porównanie z epsilon (stałym)**
 
 **ZŁE:**
 ```java
@@ -1055,49 +1410,488 @@ if (a == b) { }  // Rzadko działa poprawnie!
 
 **DOBRE:**
 ```java
-if (Math.abs(a - b) < epsilon) { }  // epsilon = mała wartość (np. 1e-9)
+double epsilon = 1e-9;  // 0.000000001
+if (Math.abs(a - b) < epsilon) {
+    // Liczby są "równe" (różnica < epsilon)
+}
 ```
+
+**Przykład:**
+```java
+double a = 0.1 + 0.2;
+double b = 0.3;
+double epsilon = 1e-9;
+
+if (Math.abs(a - b) < epsilon) {
+    System.out.println("Równe!");  // To się wyświetli ✓
+}
+```
+
+**Rozwiązanie 2: Porównanie względne (lepsze dla dużych liczb)**
 
 **Wzór:**
 |a - b| < ε * max(|a|, |b|)
 
-### 2. Utrata precyzji przy odejmowaniu (Catastrophic Cancellation)
+**Kod:**
+```java
+double epsilon = 1e-9;
+if (Math.abs(a - b) < epsilon * Math.max(Math.abs(a), Math.abs(b))) {
+    // Równe względnie
+}
+```
 
-Gdy odejmujemy dwie bardzo podobne liczby:
+**Dlaczego względne?**
+- Dla małych liczb: |a - b| < 1e-9 jest OK
+- Dla dużych liczb: |a - b| < 1e-9 może być za małe
+- **Przykład:**
+  - a = 1000000.0, b = 1000000.0000001
+  - Różnica bezwzględna: 0.0000001 < 1e-9? NIE (za duża!)
+  - Różnica względna: 0.0000001 / 1000000 = 1e-13 < 1e-9? TAK ✓
 
-a = 1.234567
-b = 1.234566
-a - b = 0.000001
+**Przykład praktyczny — funkcja porównująca:**
+```java
+boolean areEqual(double a, double b) {
+    double epsilon = 1e-9;
+    // Dla liczb bliskich zero
+    if (Math.abs(a) < epsilon && Math.abs(b) < epsilon) {
+        return true;  // Oba bliskie zero
+    }
+    // Porównanie względne
+    return Math.abs(a - b) < epsilon * Math.max(Math.abs(a), Math.abs(b));
+}
+```
 
-Wynik ma znacznie mniejszą precyzję!
+**Testy:**
+```java
+areEqual(0.1 + 0.2, 0.3);           // true ✓
+areEqual(1000000.0, 1000000.0001);  // false (różnica za duża)
+areEqual(0.0, 0.0000000001);       // true (oba bliskie zero)
+```
 
-**Przykład problematyczny:**
-pierwiastek(x + 1) - pierwiastek(x)
+### 2. Utrata precyzji przy odejmowaniu (Catastrophic Cancellation) — szczegółowo
 
-Lepsze podejście:
-1 / (pierwiastek(x + 1) + pierwiastek(x))
+**Problem:** Gdy odejmujemy dwie bardzo podobne liczby, tracimy precyzję.
 
-### 3. Przepełnienie (Overflow)
+**Dlaczego?**
+- Odejmowanie eliminuje wspólne cyfry znaczące
+- Zostają tylko różnice, które mają mniej cyfr znaczących
+- Błędy zaokrąglenia stają się względnie większe
 
-Gdy wynik jest zbyt duży dla reprezentacji:
-- Float: > 3.4 × 10^38 → +∞
-- Double: > 1.8 × 10^308 → +∞
+**Przykład szczegółowy:**
 
-### 4. Niedomiar (Underflow)
+**Sytuacja:**
+```
+a = 1.23456789012345  (15 cyfr znaczących)
+b = 1.23456789012344  (15 cyfr znaczących)
+a - b = 0.00000000000001  (tylko 1 cyfra znacząca!)
+```
 
-Gdy wynik jest zbyt mały:
-- Float: < 1.2 × 10^(-38) → może stać się 0 lub liczbą zdenormalizowaną
-- Double: < 2.2 × 10^(-308) → może stać się 0 lub liczbą zdenormalizowaną
+**Problem:** Z 15 cyfr znaczących zostało tylko 1!
 
-### 5. Operacje na NaN i Infinity
+**Przykład w kodzie:**
+```java
+double a = 1.23456789012345;
+double b = 1.23456789012344;
+double result = a - b;
+System.out.println(result);  // Może być 0.0 lub bardzo niedokładne!
+```
 
-**Reguły:**
-- NaN ∘ x = NaN (gdzie ∘ to dowolna operacja)
-- ∞ + x = ∞ (gdy x ≠ ∞)
-- ∞ - ∞ = NaN
-- 0 * ∞ = NaN
-- 0 / 0 = NaN
-- x / 0 = ±∞ (w zależności od znaku x)
+**Przykład problematyczny 1: Różnica pierwiastków**
+
+**Kod problematyczny:**
+```java
+double x = 1000000.0;
+double result = Math.sqrt(x + 1) - Math.sqrt(x);
+// Problem: sqrt(1000001) ≈ 1000.0005
+//         sqrt(1000000) = 1000.0
+//         Różnica: 0.0005, ale błędy zaokrąglenia mogą zepsuć wynik!
+```
+
+**Analiza błędu:**
+- sqrt(1000001) ≈ 1000.000499999...
+- sqrt(1000000) = 1000.0
+- W float: oba mają ~7 cyfr znaczących
+- Różnica: 0.0005 ma tylko 1 cyfrę znaczącą!
+- Błędy zaokrąglenia mogą całkowicie zepsuć wynik
+
+**Lepsze podejście — racjonalizacja:**
+```java
+// Zamiast: sqrt(x + 1) - sqrt(x)
+// Użyj: 1 / (sqrt(x + 1) + sqrt(x))
+
+double x = 1000000.0;
+double result = 1.0 / (Math.sqrt(x + 1) + Math.sqrt(x));
+// Teraz: mianownik ma duże wartości, dzielenie jest stabilne
+```
+
+**Dlaczego lepsze?**
+- Mianownik: sqrt(x+1) + sqrt(x) ≈ 2000.0 (duża wartość, stabilna)
+- Dzielenie: 1.0 / 2000.0 = 0.0005 (precyzyjne!)
+- Brak odejmowania podobnych liczb
+
+**Przykład problematyczny 2: Różnica kwadratów**
+
+**Kod problematyczny:**
+```java
+double a = 1000.0001;
+double b = 1000.0;
+double result = a * a - b * b;  // (a² - b²)
+// Problem: a² ≈ 1000000.2, b² = 1000000.0
+// Różnica: 0.2, ale błędy zaokrąglenia!
+```
+
+**Lepsze podejście — faktoryzacja:**
+```java
+// Zamiast: a² - b²
+// Użyj: (a - b)(a + b)
+
+double a = 1000.0001;
+double b = 1000.0;
+double result = (a - b) * (a + b);
+// a - b = 0.0001 (mała, ale precyzyjna)
+// a + b = 2000.0001 (duża, stabilna)
+// Iloczyn: 0.0001 × 2000.0001 = 0.2 (precyzyjne!)
+```
+
+**Przykład problematyczny 3: Obliczanie delty (wzór kwadratowy)**
+
+**Problem:** Wzór kwadratowy: x = (-b ± sqrt(b² - 4ac)) / (2a)
+
+**Kod problematyczny:**
+```java
+double a = 1.0;
+double b = 1000.0;
+double c = 1.0;
+
+double discriminant = b * b - 4 * a * c;  // 1000000 - 4 = 999996
+double sqrt_disc = Math.sqrt(discriminant);
+double x1 = (-b + sqrt_disc) / (2 * a);   // (-1000 + 999.998) / 2
+double x2 = (-b - sqrt_disc) / (2 * a);   // (-1000 - 999.998) / 2
+// Problem: -b + sqrt_disc ≈ -0.002 (odejmowanie podobnych!)
+```
+
+**Lepsze podejście:**
+```java
+// Dla x1: użyj wzoru z sumą (stabilny)
+double x1 = (-b + sqrt_disc) / (2 * a);
+
+// Dla x2: użyj wzoru z różnicą LUB relacji x1 * x2 = c/a
+double x2 = c / (a * x1);  // Z relacji Viete'a
+// LUB
+double x2 = (-b - sqrt_disc) / (2 * a);  // To jest OK (duże liczby)
+```
+
+**Jak unikać catastrophic cancellation:**
+1. **Racjonalizacja** — usuń odejmowanie z mianownika
+2. **Faktoryzacja** — rozłóż na czynniki
+3. **Alternatywne wzory** — użyj matematycznie równoważnych, ale numerycznie stabilnych
+4. **Większa precyzja** — użyj double zamiast float
+
+### 3. Przepełnienie (Overflow) — szczegółowo
+
+**Problem:** Gdy wynik jest zbyt duży dla reprezentacji, staje się nieskończonością.
+
+**Jak działa:**
+- Wykładnik osiąga maksymalną wartość (255 dla float, 2047 dla double)
+- Liczba staje się +∞ lub -∞
+- Dalsze operacje dają NaN lub ∞
+
+**Przykłady overflow:**
+
+**Przykład 1: Mnożenie dużych liczb**
+```java
+float a = 1e20f;  // 10^20
+float b = 1e20f;  // 10^20
+float result = a * b;  // 10^40 > 3.4 × 10^38 → +∞
+System.out.println(result);  // Infinity
+```
+
+**Przykład 2: Potęgowanie**
+```java
+double base = 10.0;
+double exp = 400.0;
+double result = Math.pow(base, exp);  // 10^400 > 1.8 × 10^308 → +∞
+System.out.println(result);  // Infinity
+```
+
+**Przykład 3: Sumowanie**
+```java
+float sum = 0.0f;
+for (int i = 0; i < 1000; i++) {
+    sum += 1e30f;  // Każde dodanie = 10^30
+    // Po 35 iteracjach: 35 × 10^30 > 3.4 × 10^38 → +∞
+}
+System.out.println(sum);  // Infinity
+```
+
+**Jak wykryć overflow:**
+```java
+double result = a * b;
+if (Double.isInfinite(result)) {
+    System.out.println("Overflow!");
+    // Obsłuż błąd
+}
+```
+
+**Jak unikać overflow:**
+1. **Sprawdzaj przed operacjami:**
+```java
+if (a > Double.MAX_VALUE / b) {
+    // Overflow! Obsłuż błąd
+} else {
+    double result = a * b;
+}
+```
+
+2. **Użyj logarytmów dla bardzo dużych liczb:**
+```java
+// Zamiast: a^b (może overflow)
+// Użyj: exp(b * log(a))
+double result = Math.exp(b * Math.log(a));
+```
+
+3. **Użyj większej precyzji (jeśli możliwe):**
+```java
+// BigDecimal dla bardzo dużych liczb
+BigDecimal a = new BigDecimal("1e100");
+BigDecimal b = new BigDecimal("1e100");
+BigDecimal result = a.multiply(b);  // Nie ma overflow!
+```
+
+**Wartości graniczne:**
+- **Float:** MAX_VALUE ≈ 3.4028235 × 10^38
+- **Double:** MAX_VALUE ≈ 1.7976931348623157 × 10^308
+
+### 4. Niedomiar (Underflow) — szczegółowo
+
+**Problem:** Gdy wynik jest zbyt mały, może stać się zerem lub liczbą zdenormalizowaną.
+
+**Jak działa:**
+- Wykładnik osiąga minimalną wartość (1 dla znormalizowanych)
+- Liczba staje się zdenormalizowaną (bardzo mała precyzja)
+- Lub staje się zerem (0.0)
+
+**Przykłady underflow:**
+
+**Przykład 1: Dzielenie małych liczb**
+```java
+double a = 1e-200;  // 10^(-200)
+double b = 1e100;   // 10^100
+double result = a / b;  // 10^(-300) < 2.2 × 10^(-308) → 0.0
+System.out.println(result);  // 0.0
+```
+
+**Przykład 2: Mnożenie bardzo małych liczb**
+```java
+double a = 1e-150;  // 10^(-150)
+double b = 1e-150;  // 10^(-150)
+double result = a * b;  // 10^(-300) < 2.2 × 10^(-308) → 0.0
+System.out.println(result);  // 0.0
+```
+
+**Przykład 3: Kumulacja małych wartości**
+```java
+double sum = 0.0;
+for (int i = 0; i < 1000000; i++) {
+    sum += 1e-320;  // Każde dodanie = 10^(-320)
+    // Po wielu iteracjach: może być 0.0 (underflow)
+}
+System.out.println(sum);  // Może być 0.0!
+```
+
+**Liczby zdenormalizowane (subnormal):**
+- Gdy wykładnik = 0, ale mantysa ≠ 0
+- **Float:** Najmniejsza zdenormalizowana ≈ 1.4 × 10^(-45)
+- **Double:** Najmniejsza zdenormalizowana ≈ 4.9 × 10^(-324)
+- **Problem:** Mają bardzo małą precyzję (tylko kilka cyfr znaczących)
+
+**Jak wykryć underflow:**
+```java
+double result = a * b;
+if (result == 0.0 && a != 0.0 && b != 0.0) {
+    // Prawdopodobnie underflow
+    System.out.println("Underflow!");
+}
+```
+
+**Jak unikać underflow:**
+1. **Sprawdzaj przed operacjami:**
+```java
+if (a < Double.MIN_NORMAL / b) {
+    // Underflow! Obsłuż błąd
+} else {
+    double result = a * b;
+}
+```
+
+2. **Użyj logarytmów dla bardzo małych liczb:**
+```java
+// Zamiast: a * b (może underflow)
+// Użyj: exp(log(a) + log(b))
+double result = Math.exp(Math.log(a) + Math.log(b));
+```
+
+3. **Skaluj wartości:**
+```java
+// Zamiast: bardzo małe wartości
+// Użyj: większe wartości z odpowiednim skalowaniem
+double scale = 1e100;
+double a_scaled = a * scale;
+double b_scaled = b * scale;
+double result_scaled = a_scaled * b_scaled;
+double result = result_scaled / (scale * scale);
+```
+
+**Wartości graniczne:**
+- **Float:** MIN_NORMAL ≈ 1.175494 × 10^(-38)
+- **Double:** MIN_NORMAL ≈ 2.2250738585072014 × 10^(-308)
+
+### 5. Operacje na NaN i Infinity — szczegółowo
+
+**NaN (Not a Number)** = wynik nieprawidłowej operacji matematycznej.
+
+**Infinity (Nieskończoność)** = wynik operacji, która daje nieskończoność.
+
+**Reguły operacji — szczegółowo:**
+
+**1. NaN z dowolną wartością:**
+```java
+double nan = Double.NaN;
+double x = 5.0;
+
+nan + x;    // NaN
+nan - x;    // NaN
+nan * x;    // NaN
+nan / x;    // NaN
+x / nan;    // NaN
+nan == nan; // false! (ważne!)
+```
+
+**Sprawdzanie NaN:**
+```java
+double result = Math.sqrt(-1);  // NaN
+if (Double.isNaN(result)) {
+    System.out.println("To jest NaN!");
+}
+
+// NIE używaj: result == Double.NaN (zawsze false!)
+```
+
+**2. Infinity z liczbą skończoną:**
+```java
+double inf = Double.POSITIVE_INFINITY;
+double x = 1000.0;
+
+inf + x;    // +∞
+inf - x;    // +∞
+inf * x;    // +∞ (jeśli x > 0)
+inf / x;    // +∞
+x / inf;    // 0.0
+```
+
+**3. Infinity - Infinity:**
+```java
+double inf1 = Double.POSITIVE_INFINITY;
+double inf2 = Double.POSITIVE_INFINITY;
+double result = inf1 - inf2;  // NaN (nieokreślone!)
+```
+
+**4. 0 * Infinity:**
+```java
+double zero = 0.0;
+double inf = Double.POSITIVE_INFINITY;
+double result = zero * inf;  // NaN (nieokreślone!)
+```
+
+**5. 0 / 0:**
+```java
+double zero = 0.0;
+double result = zero / zero;  // NaN
+```
+
+**6. x / 0:**
+```java
+double x = 5.0;
+double result = x / 0.0;  // +∞
+
+double y = -5.0;
+double result2 = y / 0.0;  // -∞
+```
+
+**Przykłady praktyczne:**
+
+**Przykład 1: Obliczanie średniej z tablicy**
+```java
+double[] array = {1.0, 2.0, 3.0};
+double sum = 0.0;
+for (double value : array) {
+    sum += value;
+}
+double average = sum / array.length;  // OK: 6.0 / 3 = 2.0
+
+// Ale co jeśli array.length == 0?
+double[] empty = {};
+double avg = sum / empty.length;  // x / 0 → +∞ lub -∞
+// Lepsze:
+if (array.length == 0) {
+    return Double.NaN;  // Lub obsłuż błąd
+}
+```
+
+**Przykład 2: Obliczanie pierwiastka**
+```java
+double x = -5.0;
+double result = Math.sqrt(x);  // sqrt(-5) → NaN
+if (Double.isNaN(result)) {
+    System.out.println("Nie można obliczyć pierwiastka z liczby ujemnej!");
+}
+```
+
+**Przykład 3: Sprawdzanie poprawności wyniku**
+```java
+double calculate(double a, double b) {
+    if (b == 0.0) {
+        return Double.NaN;  // Dzielenie przez zero
+    }
+    double result = a / b;
+    
+    // Sprawdź czy wynik jest poprawny
+    if (Double.isNaN(result) || Double.isInfinite(result)) {
+        return Double.NaN;  // Niepoprawny wynik
+    }
+    
+    return result;
+}
+```
+
+**Jak obsługiwać NaN i Infinity:**
+1. **Zawsze sprawdzaj wyniki:**
+```java
+double result = performCalculation();
+if (Double.isNaN(result)) {
+    // Obsłuż błąd
+} else if (Double.isInfinite(result)) {
+    // Obsłuż overflow/underflow
+} else {
+    // Użyj wyniku
+}
+```
+
+2. **Używaj wartości domyślnych:**
+```java
+double result = calculate();
+if (Double.isNaN(result)) {
+    result = 0.0;  // Wartość domyślna
+}
+```
+
+3. **Rzucaj wyjątki:**
+```java
+double result = calculate();
+if (Double.isNaN(result)) {
+    throw new ArithmeticException("Niepoprawny wynik!");
+}
+```
 
 ### 6. Asocjatywność (Brak asocjatywności)
 
@@ -1137,7 +1931,9 @@ round(x) = ceil(x - 0.5) jeśli x < 0
 
 ---
 
-## 8) Porównanie stało- vs zmiennoprzecinkowa
+## 8) Porównanie stało- vs zmiennoprzecinkowa — szczegółowa analiza
+
+### Tabela porównawcza:
 
 | Aspekt | Stałoprzecinkowa | Zmiennoprzecinkowa |
 |--------|------------------|-------------------|
@@ -1149,9 +1945,513 @@ round(x) = ceil(x - 0.5) jeśli x < 0
 | **Zastosowania** | Embedded, DSP, finanse | Nauka, inżynieria, ogólne obliczenia |
 | **Błędy** | Przewidywalne | Mogą się kumulować |
 
+### Szczegółowe porównanie z przykładami:
+
+#### 1. Precyzja
+
+**Stałoprzecinkowa:**
+- **Format Q3.5:** Zawsze precyzja 1/32 = 0.03125
+- **Przykład:** 3.5, 3.53125, 3.5625 (kroki co 0.03125)
+- **Zaleta:** Wiesz dokładnie, jaka jest precyzja
+- **Wada:** Nie możesz mieć większej precyzji dla małych liczb
+
+**Zmiennoprzecinkowa:**
+- **Float:** ~7 cyfr znaczących (zależnie od wartości)
+- **Przykład:** 
+  - 1.0 ma precyzję ~0.0000001
+  - 1000000.0 ma precyzję ~1.0 (mniejsza precyzja!)
+- **Zaleta:** Wysoka precyzja dla małych liczb
+- **Wada:** Precyzja zależy od wartości (mniejsza dla dużych liczb)
+
+**Przykład praktyczny:**
+```java
+// Stałoprzecinkowa (Q3.5)
+int a = 112;  // 3.5 (precyzja zawsze 0.03125)
+int b = 113;  // 3.53125 (następna możliwa wartość)
+
+// Zmiennoprzecinkowa (float)
+float x = 3.5f;      // Precyzja ~0.0000001
+float y = 3.5000001f; // Możliwa następna wartość
+float z = 1000000.0f; // Precyzja ~1.0 (gorsza!)
+```
+
+#### 2. Zakres
+
+**Stałoprzecinkowa:**
+- **Format Q3.5:** Zakres od -8 do ~7.97 (8 bitów)
+- **Format Q15.16:** Zakres od -32768 do ~32767.99998 (31 bitów)
+- **Problem:** Musisz wybrać format odpowiedni do zakresu
+
+**Zmiennoprzecinkowa:**
+- **Float:** Od ~1.4 × 10^(-45) do ~3.4 × 10^38
+- **Double:** Od ~4.9 × 10^(-324) do ~1.8 × 10^308
+- **Zaleta:** Ogromny zakres w jednym formacie
+
+**Przykład praktyczny:**
+```java
+// Stałoprzecinkowa (Q3.5) - nie może reprezentować:
+int large = 100;  // 3.125 (OK)
+int tooLarge = 1000;  // 31.25 - za duże! Overflow!
+
+// Zmiennoprzecinkowa - może reprezentować:
+float small = 1e-40f;   // OK
+float large = 1e30f;    // OK
+float huge = 1e100f;    // +∞ (overflow, ale bardzo duże!)
+```
+
+#### 3. Szybkość
+
+**Stałoprzecinkowa:**
+- Operacje na liczbach całkowitych (szybkie!)
+- **Przykład:** 80 + 40 = 120 (jedna operacja całkowita)
+- **Czas:** ~1 cykl procesora
+
+**Zmiennoprzecinkowa:**
+- Wymaga:
+  - Wyrównania wykładników (dodawanie/odejmowanie)
+  - Normalizacji wyników
+  - Zaokrąglania
+- **Przykład:** 3.5 + 2.5 wymaga wielu operacji
+- **Czas:** ~5-10 cykli procesora (lub więcej)
+
+**Pomiary praktyczne (przybliżone):**
+- **Dodawanie:** Stałoprzecinkowa ~2x szybsza
+- **Mnożenie:** Stałoprzecinkowa ~3x szybsza
+- **Dzielenie:** Podobna szybkość (oba wolne)
+
+#### 4. Determinizm
+
+**Stałoprzecinkowa:**
+- **Zawsze ten sam wynik** dla tych samych danych
+- **Przykład:** 80 + 40 zawsze = 120
+- **Zaleta:** Przewidywalne, łatwe do testowania
+
+**Zmiennoprzecinkowa:**
+- **Może różnić się między systemami** (różne implementacje)
+- **Przykład:** 0.1 + 0.2 może dać różne wyniki na różnych procesorach
+- **Wada:** Trudniejsze testowanie, możliwe różnice między platformami
+
+**Przykład problemu:**
+```java
+// Na procesorze A:
+float result = 0.1f + 0.2f;  // 0.30000001
+
+// Na procesorze B (inna implementacja):
+float result = 0.1f + 0.2f;  // 0.30000002 (może być różne!)
+```
+
+#### 5. Złożoność implementacji
+
+**Stałoprzecinkowa:**
+- **Trzeba ręcznie:**
+  - Wybierać format (Qm.n)
+  - Zarządzać przesunięciami bitowymi
+  - Sprawdzać przepełnienia
+  - Normalizować różne formaty
+- **Przykład:** Mnożenie wymaga przesunięcia bitowego
+
+**Zmiennoprzecinkowa:**
+- **Transparentna** — kompilator/procesor robi wszystko automatycznie
+- **Przykład:** Po prostu piszesz `a * b`, procesor robi resztę
+- **Zaleta:** Łatwiejsze w użyciu
+
+### Praktyczne przykłady wyboru:
+
+**Przykład 1: System wbudowany (mikrokontroler)**
+
+**Wymagania:**
+- Ograniczona pamięć (mało RAM)
+- Ograniczona moc procesora
+- Deterministyczny czas wykonania
+- Precyzja wystarczająca (np. temperatura do 0.1°C)
+
+**Wybór: Stałoprzecinkowa (Q7.8)**
+```java
+// Format Q7.8 (16 bitów) - oszczędność pamięci
+int temperature = 250;  // 25.0°C (250 / 10)
+int threshold = 300;    // 30.0°C (300 / 10)
+
+if (temperature > threshold) {
+    turnOnCooling();
+}
+```
+
+**Przykład 2: Obliczenia naukowe (fizyka)**
+
+**Wymagania:**
+- Wysoka precyzja (wiele cyfr znaczących)
+- Szeroki zakres wartości (od bardzo małych do bardzo dużych)
+- Kompleksowe obliczenia
+
+**Wybór: Zmiennoprzecinkowa (double)**
+```java
+// Obliczanie trajektorii rakiety
+double position = 1000000.0;      // 1 milion metrów
+double velocity = 5000.0;         // 5 km/s
+double acceleration = 9.81;       // m/s²
+double time = 0.001;              // 1 milisekunda
+
+double newPosition = position + velocity * time + 0.5 * acceleration * time * time;
+// Wymaga wysokiej precyzji i szerokiego zakresu
+```
+
+**Przykład 3: Aplikacja finansowa**
+
+**Wymagania:**
+- Deterministyczna precyzja (pieniądze muszą się zgadzać!)
+- Brak błędów zaokrąglenia
+- Przewidywalne obliczenia
+
+**Wybór: Stałoprzecinkowa (lub specjalne typy)**
+```java
+// Format: cena w groszach (dzielimy przez 100)
+long priceInGrosze = 1250L;  // 12.50 zł (używamy long dla większego zakresu)
+
+// Operacje:
+long price1 = 1250L;  // 12.50 zł
+long price2 = 750L;    // 7.50 zł
+long total = price1 + price2;  // 2000 groszy = 20.00 zł ✓
+
+// Zawsze dokładne, bez błędów zaokrąglenia!
+```
+
+**Przykład 4: Grafika komputerowa (3D)**
+
+**Wymagania:**
+- Szybkość (60 FPS = 16ms na klatkę)
+- Precyzja wystarczająca dla pikseli
+- Dużo obliczeń (tysiące wierzchołków)
+
+**Wybór: Zmiennoprzecinkowa (float)**
+```java
+// Współrzędne 3D
+float x = 1.5f;
+float y = 2.3f;
+float z = 0.8f;
+
+// Transformacje (macierze)
+float[] matrix = new float[16];
+// Szybkie obliczenia, precyzja wystarczająca
+```
+
+### Kiedy używać którego — decyzja praktyczna:
+
+**Użyj stałoprzecinkowej, gdy:**
+- ✅ Potrzebujesz deterministycznej precyzji
+- ✅ Masz ograniczone zasoby (pamięć, procesor)
+- ✅ Potrzebujesz szybkości
+- ✅ Precyzja jest stała i znana z góry
+- ✅ Aplikacje finansowe, embedded, DSP
+
+**Użyj zmiennoprzecinkowej, gdy:**
+- ✅ Potrzebujesz szerokiego zakresu wartości
+- ✅ Precyzja zależy od wartości (małe liczby = wysoka precyzja)
+- ✅ Kompleksowe obliczenia naukowe
+- ✅ Nie potrzebujesz determinizmu
+- ✅ Aplikacje naukowe, inżynierskie, ogólne programowanie
+
+### Hybrydowe podejście:
+
+**Możesz używać obu w jednym systemie!**
+
+**Przykład: System kontroli temperatury**
+```java
+// Stałoprzecinkowa dla szybkich obliczeń kontrolnych
+int temperature = 250;  // 25.0°C (Q7.8)
+int setpoint = 300;     // 30.0°C
+
+if (temperature > setpoint) {
+    // Zmiennoprzecinkowa dla złożonych obliczeń
+    double pidOutput = calculatePID(temperature, setpoint);  // double
+    adjustSystem(pidOutput);
+}
+```
+
 ---
 
-## 9) Wzory podsumowujące
+## 9) Praktyczne przykłady konwersji i implementacji
+
+### Konwersja między stało- a zmiennoprzecinkową
+
+**Przykład 1: Konwersja zmiennoprzecinkowej na stałoprzecinkową**
+
+**Problem:** Masz wartość float i chcesz ją przechować w formacie stałoprzecinkowym.
+
+**Rozwiązanie:**
+```java
+// Format Q7.8 (15 bitów całkowitych, 8 bitów ułamkowych)
+// Precyzja: 1/256 = 0.00390625
+
+float value = 25.5f;  // Wartość zmiennoprzecinkowa
+int fixed = (int)(value * 256);  // 25.5 * 256 = 6528
+
+// Sprawdzenie:
+float converted = fixed / 256.0f;  // 6528 / 256 = 25.5 ✓
+```
+
+**Uwaga:** Może wystąpić utrata precyzji, jeśli format stałoprzecinkowy ma mniejszą precyzję.
+
+**Przykład 2: Konwersja stałoprzecinkowej na zmiennoprzecinkową**
+
+**Problem:** Masz wartość w formacie stałoprzecinkowym i chcesz ją przekonwertować na float.
+
+**Rozwiązanie:**
+```java
+// Format Q7.8
+int fixed = 6528;  // 25.5 w formacie stałoprzecinkowym
+float value = fixed / 256.0f;  // 6528 / 256 = 25.5 ✓
+```
+
+**Przykład 3: Konwersja między różnymi formatami stałoprzecinkowymi**
+
+**Problem:** Masz wartość w formacie Q3.5 i chcesz ją przekonwertować na Q7.8.
+
+**Rozwiązanie:**
+```java
+// Format źródłowy: Q3.5 (n1 = 5)
+int valueQ35 = 112;  // 3.5 (112 / 32)
+
+// Konwersja na wartość rzeczywistą:
+float realValue = valueQ35 / 32.0f;  // 3.5
+
+// Konwersja na format docelowy: Q7.8 (n2 = 8)
+int valueQ78 = (int)(realValue * 256);  // 3.5 * 256 = 896
+
+// Sprawdzenie:
+float check = valueQ78 / 256.0f;  // 896 / 256 = 3.5 ✓
+```
+
+**Wzór ogólny:**
+```
+Wartość rzeczywista = N1 / (2^n1)
+N2 = Wartość rzeczywista * (2^n2)
+N2 = (N1 / (2^n1)) * (2^n2) = N1 * (2^(n2 - n1))
+```
+
+### Implementacja klasy dla stałoprzecinkowej (przykład)
+
+**Przykład klasy FixedPoint w Javie:**
+
+```java
+public class FixedPoint {
+    private final int value;  // Wartość całkowita
+    private final int fractionalBits;  // Liczba bitów ułamkowych (n)
+    
+    // Format: Qm.n, gdzie n = fractionalBits
+    public FixedPoint(int value, int fractionalBits) {
+        this.value = value;
+        this.fractionalBits = fractionalBits;
+    }
+    
+    // Konstruktor z wartości rzeczywistej
+    public FixedPoint(double realValue, int fractionalBits) {
+        this.fractionalBits = fractionalBits;
+        this.value = (int)(realValue * (1 << fractionalBits));
+    }
+    
+    // Konwersja na wartość rzeczywistą
+    public double toDouble() {
+        return value / (double)(1 << fractionalBits);
+    }
+    
+    // Dodawanie
+    public FixedPoint add(FixedPoint other) {
+        if (this.fractionalBits != other.fractionalBits) {
+            throw new IllegalArgumentException("Różne formaty!");
+        }
+        return new FixedPoint(this.value + other.value, this.fractionalBits);
+    }
+    
+    // Mnożenie
+    public FixedPoint multiply(FixedPoint other) {
+        if (this.fractionalBits != other.fractionalBits) {
+            throw new IllegalArgumentException("Różne formaty!");
+        }
+        // Przesunięcie w prawo o fractionalBits bitów
+        long result = (long)this.value * (long)other.value;
+        int shifted = (int)(result >> fractionalBits);
+        return new FixedPoint(shifted, this.fractionalBits);
+    }
+    
+    // Dzielenie
+    public FixedPoint divide(FixedPoint other) {
+        if (this.fractionalBits != other.fractionalBits) {
+            throw new IllegalArgumentException("Różne formaty!");
+        }
+        if (other.value == 0) {
+            throw new ArithmeticException("Dzielenie przez zero!");
+        }
+        // Przesunięcie w lewo o fractionalBits bitów przed dzieleniem
+        long shifted = (long)this.value << fractionalBits;
+        int result = (int)(shifted / other.value);
+        return new FixedPoint(result, this.fractionalBits);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%.5f", toDouble());
+    }
+}
+
+// Przykład użycia:
+FixedPoint a = new FixedPoint(3.5, 5);  // Q3.5, wartość 3.5
+FixedPoint b = new FixedPoint(2.0, 5);  // Q3.5, wartość 2.0
+FixedPoint sum = a.add(b);              // 5.5
+FixedPoint product = a.multiply(b);      // 7.0
+FixedPoint quotient = a.divide(b);      // 1.75
+```
+
+### Praktyczne przykłady zastosowań — szczegółowe case studies
+
+**Case Study 1: System kontroli temperatury (embedded)**
+
+**Wymagania:**
+- Temperatura: -50°C do 150°C (zakres 200°C)
+- Precyzja: 0.1°C
+- Szybkie obliczenia (czas rzeczywisty)
+
+**Projekt:**
+- Format: Q8.8 (16 bitów)
+- Zakres: -128 do 127.996
+- Precyzja: 1/256 = 0.00390625°C (wystarczająca!)
+
+**Implementacja:**
+```java
+// Konwersja temperatury na format stałoprzecinkowy
+int temperatureToFixed(double temp) {
+    return (int)(temp * 256);  // temp * 256
+}
+
+// Konwersja z formatu stałoprzecinkowego
+double fixedToTemperature(int fixed) {
+    return fixed / 256.0;
+}
+
+// Przykład:
+int temp1 = temperatureToFixed(25.5);  // 25.5 * 256 = 6528
+int temp2 = temperatureToFixed(30.0);  // 30.0 * 256 = 7680
+
+// Porównanie (szybkie, całkowite):
+if (temp1 > temp2) {
+    System.out.println("temp1 jest wyższa");
+}
+
+// Różnica:
+int diff = temp2 - temp1;  // 7680 - 6528 = 1152
+double diffCelsius = fixedToTemperature(diff);  // 1152 / 256 = 4.5°C ✓
+```
+
+**Case Study 2: Przetwarzanie sygnału audio**
+
+**Wymagania:**
+- Próbki audio: 16-bit (zakres -32768 do 32767)
+- Częstotliwość próbkowania: 44100 Hz
+- Filtrowanie w czasie rzeczywistym
+
+**Projekt:**
+- Format: Q15.16 (31 bitów)
+- Zakres: -32768 do 32767.99998
+- Precyzja: 1/65536 (wystarczająca dla audio)
+
+**Implementacja:**
+```java
+// Próbka audio w formacie stałoprzecinkowym
+int sample = 16384;  // 0.25 w zakresie [-1.0, 1.0]
+
+// Filtrowanie (przykład: średnia ruchoma)
+int[] buffer = new int[10];
+int sum = 0;
+for (int i = 0; i < buffer.length; i++) {
+    sum += buffer[i];  // Szybkie dodawanie całkowite
+}
+int filtered = sum / buffer.length;  // Średnia
+```
+
+**Case Study 3: System finansowy**
+
+**Wymagania:**
+- Kwoty: do 1 000 000 zł
+- Precyzja: do grosza (0.01 zł)
+- Brak błędów zaokrąglenia
+
+**Projekt:**
+- Format: cena w groszach (dzielimy przez 100)
+- Używamy long (64 bitów) dla większego zakresu
+- Zakres: -9 223 372 036 854 775 808 do 9 223 372 036 854 775 807 groszy
+
+**Implementacja:**
+```java
+// Przechowywanie ceny w groszach
+long priceInGrosze = 1250L;  // 12.50 zł
+
+// Operacje:
+long price1 = 1250L;  // 12.50 zł
+long price2 = 750L;    // 7.50 zł
+long total = price1 + price2;  // 2000 groszy = 20.00 zł ✓
+
+// Mnożenie przez ilość:
+int quantity = 3;
+long totalPrice = price1 * quantity;  // 1250 * 3 = 3750 groszy = 37.50 zł ✓
+
+// Dzielenie (uwaga na precyzję!):
+long discount = 250L;  // 2.50 zł zniżki
+long finalPrice = totalPrice - discount;  // 3750 - 250 = 3500 groszy = 35.00 zł ✓
+
+// Konwersja na string do wyświetlenia:
+String displayPrice = String.format("%.2f zł", totalPrice / 100.0);
+// "20.00 zł"
+```
+
+**Case Study 4: Obliczenia naukowe (fizyka)**
+
+**Wymagania:**
+- Wysoka precyzja (wiele cyfr znaczących)
+- Szeroki zakres (od bardzo małych do bardzo dużych)
+- Kompleksowe obliczenia
+
+**Projekt:**
+- Format: double (64-bit zmiennoprzecinkowa)
+- Precyzja: ~15-17 cyfr dziesiętnych
+- Zakres: ±1.8 × 10^308
+
+**Implementacja:**
+```java
+// Obliczanie trajektorii
+double position = 1000000.0;      // 1 milion metrów
+double velocity = 5000.0;         // 5 km/s
+double acceleration = 9.81;      // m/s²
+double time = 0.001;              // 1 milisekunda
+
+// Równanie: s = s0 + v*t + 0.5*a*t²
+double newPosition = position + velocity * time + 0.5 * acceleration * time * time;
+// Wymaga wysokiej precyzji i szerokiego zakresu
+```
+
+### Najlepsze praktyki — podsumowanie
+
+**Dla stałoprzecinkowej:**
+1. ✅ Wybierz format odpowiedni do zakresu i precyzji
+2. ✅ Używaj tego samego formatu w całym systemie (jeśli możliwe)
+3. ✅ Sprawdzaj przepełnienia przed operacjami
+4. ✅ Używaj większych typów (long) dla pośrednich obliczeń
+5. ✅ Dokumentuj format (Qm.n) w kodzie
+
+**Dla zmiennoprzecinkowej:**
+1. ✅ Używaj double zamiast float, gdy potrzebna większa precyzja
+2. ✅ NIGDY nie porównuj przez == (używaj epsilon)
+3. ✅ Unikaj odejmowania podobnych liczb (catastrophic cancellation)
+4. ✅ Sprawdzaj NaN i Infinity po operacjach
+5. ✅ Uważaj na overflow/underflow
+
+**Ogólne:**
+1. ✅ Wybierz odpowiedni typ do zastosowania
+2. ✅ Testuj na rzeczywistych danych
+3. ✅ Dokumentuj założenia o precyzji
+4. ✅ Obsługuj błędy (NaN, Infinity, overflow)
+
+---
+
+## 10) Wzory podsumowujące
 
 ### Stałoprzecinkowa (Qm.n):
 V = N / (2^n)
