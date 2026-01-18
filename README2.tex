@@ -1,0 +1,1280 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\title{Arytmetyka Stało- i Zmiennoprzecinkowa \\ Kompletna Notatka do Obrony}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Podstawy — od zera (dla początkujących)}
+
+\subsection{Co to jest bit i bajt?}
+
+\textbf{Bit} — najmniejsza jednostka informacji w komputerze:
+\begin{itemize}
+    \item Może mieć wartość \textbf{0} lub \textbf{1} (tylko dwie możliwości!)
+    \item To jak włącznik światła: włączony (1) lub wyłączony (0)
+\end{itemize}
+
+\textbf{Bajt} — 8 bitów razem:
+\begin{itemize}
+    \item 1 bajt = 8 bitów
+    \item Może reprezentować wartości od 0 do 255 ($2^8 = 256$ możliwości)
+\end{itemize}
+
+\textbf{Przykład:}
+\begin{itemize}
+    \item 1 bit: 0 lub 1 (2 możliwości)
+    \item 2 bity: 00, 01, 10, 11 (4 możliwości: 0, 1, 2, 3)
+    \item 3 bity: 000, 001, 010, 011, 100, 101, 110, 111 (8 możliwości: 0-7)
+    \item 8 bitów (1 bajt): 256 możliwości (0-255)
+\end{itemize}
+
+\subsection{Dlaczego komputer używa systemu binarnego?}
+
+\textbf{System dziesiętny} (używamy na co dzień):
+\begin{itemize}
+    \item 10 cyfr: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    \item Podstawa: 10
+    \item Przykład: $123 = 1 \times 10^2 + 2 \times 10^1 + 3 \times 10^0$
+\end{itemize}
+
+\textbf{System binarny} (komputer):
+\begin{itemize}
+    \item 2 cyfry: 0, 1
+    \item Podstawa: 2
+    \item Przykład: $1011 = 1 \times 2^3 + 0 \times 2^2 + 1 \times 2^1 + 1 \times 2^0 = 8 + 0 + 2 + 1 = 11$
+\end{itemize}
+
+\textbf{Dlaczego binarny?}
+\begin{itemize}
+    \item Łatwo zaimplementować w elektronice (prąd płynie = 1, nie płynie = 0)
+    \item Proste bramki logiczne (AND, OR, NOT)
+    \item Odporne na błędy (łatwo odróżnić 0 od 1)
+\end{itemize}
+
+\subsection{Jak działa system binarny — krok po kroku}
+
+\textbf{Zasada:} Każda pozycja ma wagę będącą potęgą 2
+
+\textbf{Tabela wag (od prawej do lewej):}
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Pozycja & Waga & Wartość \\
+\hline
+0 (najbardziej na prawo) & $2^0 = 1$ & 1 \\
+1 & $2^1 = 2$ & 2 \\
+2 & $2^2 = 4$ & 4 \\
+3 & $2^3 = 8$ & 8 \\
+4 & $2^4 = 16$ & 16 \\
+5 & $2^5 = 32$ & 32 \\
+6 & $2^6 = 64$ & 64 \\
+7 & $2^7 = 128$ & 128 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Przykład 1: Konwersja binarnego na dziesiętny}
+
+Liczba binarna: \textbf{1011}
+
+Krok po kroku:
+\begin{enumerate}
+    \item Zapisujemy pozycje (od prawej, zaczynając od 0):
+    \begin{verbatim}
+    1  0  1  1
+    3  2  1  0  (pozycje)
+    \end{verbatim}
+    
+    \item Mnożymy każdą cyfrę przez wagę jej pozycji:
+    \begin{itemize}
+        \item Pozycja 0 (cyfra 1): $1 \times 2^0 = 1 \times 1 = \textbf{1}$
+        \item Pozycja 1 (cyfra 1): $1 \times 2^1 = 1 \times 2 = \textbf{2}$
+        \item Pozycja 2 (cyfra 0): $0 \times 2^2 = 0 \times 4 = \textbf{0}$
+        \item Pozycja 3 (cyfra 1): $1 \times 2^3 = 1 \times 8 = \textbf{8}$
+    \end{itemize}
+    
+    \item Sumujemy: $8 + 0 + 2 + 1 = \textbf{11}$
+\end{enumerate}
+
+Wynik: 1011 (binarnie) = 11 (dziesiętnie) $\checkmark$
+
+\subsection{Przykład 2: Konwersja dziesiętnego na binarny}
+
+Liczba dziesiętna: \textbf{13}
+
+Metoda: Dzielimy przez 2 i zapisujemy reszty
+
+Krok po kroku:
+\begin{enumerate}
+    \item $13 \div 2 = 6$ reszta \textbf{1} $\leftarrow$ zapisujemy
+    \item $6 \div 2 = 3$ reszta \textbf{0} $\leftarrow$ zapisujemy
+    \item $3 \div 2 = 1$ reszta \textbf{1} $\leftarrow$ zapisujemy
+    \item $1 \div 2 = 0$ reszta \textbf{1} $\leftarrow$ zapisujemy
+    \item Czytamy reszty \textbf{od dołu do góry}: 1101
+\end{enumerate}
+
+Wynik: 13 (dziesiętnie) = 1101 (binarnie) $\checkmark$
+
+\textbf{Sprawdzenie:} $1 \times 8 + 1 \times 4 + 0 \times 2 + 1 \times 1 = 8 + 4 + 0 + 1 = 13$ $\checkmark$
+
+\subsection{Liczby całkowite vs rzeczywiste}
+
+\textbf{Liczby całkowite} (integers):
+\begin{itemize}
+    \item Przykłady: -5, 0, 1, 42, 1000
+    \item \textbf{Brak części ułamkowej}
+    \item Łatwe do reprezentacji w binarnym
+\end{itemize}
+
+\textbf{Liczby rzeczywiste} (floating-point):
+\begin{itemize}
+    \item Przykłady: 3.14, -0.5, 123.456, 0.001
+    \item \textbf{Mają część ułamkową} (po przecinku)
+    \item Trudniejsze do reprezentacji w binarnym!
+\end{itemize}
+
+\textbf{Problem:} Jak zapisać 3.14 w binarnym?
+\begin{itemize}
+    \item Część całkowita: 3 = 11 (binarnie) $\checkmark$
+    \item Część ułamkowa: 0.14 = ??? (to jest problem!)
+\end{itemize}
+
+\subsection{Część ułamkowa w systemie binarnym}
+
+\textbf{Zasada:} Po przecinku pozycje mają wagi będące ujemnymi potęgami 2
+
+\textbf{Tabela wag części ułamkowej:}
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Pozycja & Waga & Wartość \\
+\hline
+-1 (pierwsza po przecinku) & $2^{-1} = 1/2$ & 0.5 \\
+-2 & $2^{-2} = 1/4$ & 0.25 \\
+-3 & $2^{-3} = 1/8$ & 0.125 \\
+-4 & $2^{-4} = 1/16$ & 0.0625 \\
+-5 & $2^{-5} = 1/32$ & 0.03125 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Przykład: Konwersja ułamka dziesiętnego na binarny}
+
+Liczba: \textbf{0.625} (dziesiętnie)
+
+Metoda: Mnożymy przez 2 i zapisujemy część całkowitą
+
+Krok po kroku:
+\begin{enumerate}
+    \item $0.625 \times 2 = \textbf{1}.25 \rightarrow$ zapisujemy \textbf{1}, zostaje 0.25
+    \item $0.25 \times 2 = \textbf{0}.5 \rightarrow$ zapisujemy \textbf{0}, zostaje 0.5
+    \item $0.5 \times 2 = \textbf{1}.0 \rightarrow$ zapisujemy \textbf{1}, zostaje 0.0 (koniec!)
+    \item Czytamy \textbf{od góry do dołu}: 0.101
+\end{enumerate}
+
+Wynik: 0.625 (dziesiętnie) = 0.101 (binarnie) $\checkmark$
+
+\textbf{Sprawdzenie:} $1 \times 0.5 + 0 \times 0.25 + 1 \times 0.125 = 0.5 + 0 + 0.125 = 0.625$ $\checkmark$
+
+\textbf{Problem z niektórymi liczbami:}
+\begin{itemize}
+    \item 0.1 (dziesiętnie) = 0.00011001100110011... (binarnie, \textbf{nieskończone!})
+    \item Komputer musi zaokrąglić $\rightarrow$ błędy zaokrąglenia!
+\end{itemize}
+
+\section{Wprowadzenie — reprezentacja liczb w komputerze}
+
+\subsection{Podstawowy problem}
+Komputer przechowuje liczby w formie \textbf{binarnej} (0 i 1). Dla liczb całkowitych to proste, ale dla liczb rzeczywistych (z częścią ułamkową) potrzebujemy specjalnych reprezentacji.
+
+\textbf{Dlaczego to problem?}
+\begin{itemize}
+    \item Liczby całkowite: łatwe (np. 5 = 101 binarnie)
+    \item Liczby rzeczywiste: trudne (np. 3.14 — jak zapisać część ułamkową?)
+    \item Niektóre liczby dziesiętne nie mają dokładnej reprezentacji binarnej (np. 0.1)
+\end{itemize}
+
+\subsection{Dwie główne metody:}
+\begin{enumerate}
+    \item \textbf{Stałoprzecinkowa} (Fixed-Point) — pozycja przecinka jest \textbf{ustalona} (zawsze w tym samym miejscu)
+    \item \textbf{Zmiennoprzecinkowa} (Floating-Point) — pozycja przecinka jest \textbf{zmienna} (może się przesuwać)
+\end{enumerate}
+
+\section{Reprezentacja liczb całkowitych (podstawa)}
+
+\subsection{System binarny — wzór matematyczny}
+
+Liczba w systemie binarnym:
+\[
+N = \sum_{i=0}^{n-1} b_i \cdot 2^i
+\]
+
+Gdzie:
+\begin{itemize}
+    \item $b_i$ — cyfra binarna (0 lub 1) na pozycji $i$
+    \item $n$ — liczba bitów
+    \item $i$ — pozycja bitu (0 = najbardziej na prawo)
+\end{itemize}
+
+\textbf{Intuicja:} Każda pozycja ma wagę będącą potęgą 2, mnożymy cyfrę przez wagę i sumujemy.
+
+\subsection{Zakresy (n-bitowe liczby całkowite):}
+\begin{itemize}
+    \item \textbf{Bez znaku} (unsigned): $0$ do $(2^n - 1)$
+    \item \textbf{Ze znakiem} (signed, two's complement): $-(2^{n-1})$ do $(2^{n-1} - 1)$
+\end{itemize}
+
+\subsection{Przykłady zakresów:}
+\begin{itemize}
+    \item 8 bitów: -128 do 127 (ze znakiem) lub 0 do 255 (bez znaku)
+    \item 16 bitów: -32 768 do 32 767 (ze znakiem) lub 0 do 65 535 (bez znaku)
+    \item 32 bity: -2 147 483 648 do 2 147 483 647 (ze znakiem) lub 0 do 4 294 967 295 (bez znaku)
+\end{itemize}
+
+\section{Arytmetyka stałoprzecinkowa (Fixed-Point Arithmetic)}
+
+\subsection{Definicja — intuicyjnie}
+
+\textbf{Stałoprzecinkowa} = sposób zapisu liczb z przecinkiem, gdzie \textbf{pozycja przecinka jest zawsze w tym samym miejscu}.
+
+\textbf{Pomysł:} Zamiast przechowywać 3.5, przechowujemy 35 i "wiemy", że przecinek jest po pierwszej cyfrze.
+
+\textbf{Przykład z życia:}
+\begin{itemize}
+    \item Ceny w sklepie: 3.50 zł, 12.99 zł, 0.50 zł
+    \item Możemy zapisać jako: 350 groszy, 1299 groszy, 50 groszy
+    \item Wiemy, że zawsze dzielimy przez 100 (bo 1 zł = 100 groszy)
+\end{itemize}
+
+\textbf{W komputerze:} Zamiast dzielić przez 100, dzielimy przez potęgę 2 (np. 32, 64, 128).
+
+\subsection{Definicja formalna}
+
+Liczba jest reprezentowana jako \textbf{liczba całkowita}, ale interpretowana jako wartość podzielona przez pewną stałą (zwykle potęgę 2).
+
+\subsection{Reprezentacja — krok po kroku}
+
+\textbf{W pamięci komputera:}
+\begin{itemize}
+    \item Przechowujemy: $N =$ wartość całkowita (np. 112)
+\end{itemize}
+
+\textbf{Rzeczywista wartość:}
+\begin{itemize}
+    \item Obliczamy: $V = N / (2^f)$
+\end{itemize}
+
+Gdzie:
+\begin{itemize}
+    \item \textbf{$f$} — liczba bitów przeznaczona na część ułamkową (fractional part)
+    \item \textbf{$N$} — wartość całkowita w pamięci
+    \item \textbf{$V$} — rzeczywista wartość (z przecinkiem)
+\end{itemize}
+
+\textbf{Przykład:}
+\begin{itemize}
+    \item Format: 5 bitów ułamkowych ($f = 5$)
+    \item W pamięci: $N = 112$
+    \item Rzeczywista wartość: $V = 112 / (2^5) = 112 / 32 = 3.5$ $\checkmark$
+\end{itemize}
+
+\subsection{Format Qm.n (lub Qf) — wyjaśnienie}
+
+\textbf{Notacja Qm.n:}
+\begin{itemize}
+    \item \textbf{Q} — oznacza "fixed-point" (stałoprzecinkowa)
+    \item \textbf{$m$} — liczba bitów na część całkowitą (integer part)
+    \item \textbf{$n$} — liczba bitów na część ułamkową (fractional part)
+    \item \textbf{Całkowita liczba bitów:} $m + n$
+\end{itemize}
+
+\textbf{Przykład: Q3.5}
+\begin{itemize}
+    \item 3 bity na część całkowitą (może reprezentować 0-7)
+    \item 5 bitów na część ułamkową (precyzja $1/32 = 0.03125$)
+    \item Razem: 8 bitów
+\end{itemize}
+
+\textbf{Czasem zapisywane jako Qn} (gdzie $n$ to tylko część ułamkowa, część całkowita jest nieokreślona).
+
+\subsection{Wzór na wartość rzeczywistą:}
+
+\textbf{Podstawowy wzór:}
+\[
+V = \frac{N}{2^n}
+\]
+
+Gdzie:
+\begin{itemize}
+    \item \textbf{$N$} — wartość całkowita w pamięci
+    \item \textbf{$n$} — liczba bitów części ułamkowej
+    \item \textbf{$V$} — rzeczywista wartość
+\end{itemize}
+
+\textbf{Intuicja:} Dzielimy przez $2^n$, bo każdy bit ułamkowy reprezentuje $1/(2^n)$.
+
+\textbf{Przykład:}
+\begin{itemize}
+    \item Format: Q3.5 ($n = 5$)
+    \item W pamięci: $N = 107$
+    \item $V = 107 / (2^5) = 107 / 32 = 3.34375$ $\checkmark$
+\end{itemize}
+
+\subsection{Operacje arytmetyczne w stałoprzecinkowej}
+
+\subsubsection{Dodawanie liczb stałoprzecinkowych}
+
+\textbf{Zasada:} Dodajemy wartości całkowite, wynik dzielimy przez $2^n$
+
+\textbf{Wzór:}
+\[
+V_1 + V_2 = \frac{N_1 + N_2}{2^n}
+\]
+
+\textbf{Kroki:}
+\begin{enumerate}
+    \item Upewnij się, że oba operandy mają ten sam format (te same $n$)
+    \item Dodaj wartości całkowite $N_1 + N_2$
+    \item Wynik automatycznie ma poprawną wartość rzeczywistą
+\end{enumerate}
+
+\subsubsection{Odejmowanie liczb stałoprzecinkowych}
+
+\textbf{Zasada:} Odejmujemy wartości całkowite, wynik dzielimy przez $2^n$
+
+\textbf{Wzór:}
+\[
+V_1 - V_2 = \frac{N_1 - N_2}{2^n}
+\]
+
+\subsubsection{Mnożenie liczb stałoprzecinkowych}
+
+\textbf{Zasada:} Mnożymy wartości całkowite, wynik ma podwójną precyzję części ułamkowej
+
+\textbf{Wzór:}
+\[
+V_1 \cdot V_2 = \frac{N_1 \cdot N_2}{2^{2n}} = \frac{N_1 \cdot N_2}{2^n \cdot 2^n}
+\]
+
+\textbf{Problem:} Po mnożeniu wynik ma $2n$ bitów części ułamkowej zamiast $n$!
+
+\textbf{Rozwiązanie:} Trzeba \textbf{przesunąć w prawo} o $n$ bitów (lub podzielić przez $2^n$)
+
+\textbf{Wzór końcowy:}
+\[
+\text{wynik} = \frac{N_1 \cdot N_2}{2^n}
+\]
+
+\textbf{Kroki:}
+\begin{enumerate}
+    \item Pomnóż wartości całkowite $N_1 \cdot N_2$
+    \item Przesuń wynik w prawo o $n$ bitów (lub podziel przez $2^n$)
+    \item Wynik ma poprawną wartość rzeczywistą
+\end{enumerate}
+
+\subsubsection{Dzielenie liczb stałoprzecinkowych}
+
+\textbf{Zasada:} Dzielimy wartości całkowite, ale trzeba najpierw zwiększyć precyzję dzielnej
+
+\textbf{Wzór:}
+\[
+\frac{V_1}{V_2} = \frac{N_1 / N_2}{2^n / 2^n} = \frac{N_1 \cdot 2^n}{N_2}
+\]
+
+\textbf{Problem:} Dzielenie całkowite traci precyzję części ułamkowej!
+
+\textbf{Rozwiązanie:} Przed dzieleniem \textbf{przesuń w lewo} dzielną o $n$ bitów (lub pomnóż przez $2^n$)
+
+\textbf{Kroki:}
+\begin{enumerate}
+    \item Przesuń $N_1$ w lewo o $n$ bitów ($N_1 \cdot 2^n$)
+    \item Podziel przez $N_2$
+    \item Wynik ma poprawną wartość rzeczywistą
+\end{enumerate}
+
+\section{Arytmetyka zmiennoprzecinkowa (Floating-Point Arithmetic)}
+
+\subsection{Definicja — intuicyjnie}
+
+\textbf{Zmiennoprzecinkowa} = sposób zapisu liczb w formie \textbf{naukowej} (notacji wykładniczej), gdzie przecinek może się przesuwać.
+
+\textbf{Przykład z życia:}
+\begin{itemize}
+    \item Liczba: 1234567890
+    \item W notacji naukowej: $1.234567890 \times 10^9$
+    \item Widzisz? Przecinek przesunął się w lewo, a wykładnik (9) mówi, o ile miejsc
+\end{itemize}
+
+\textbf{W komputerze:} Zamiast 10, używamy 2 (bo binarny).
+
+\textbf{Przykład:}
+\begin{itemize}
+    \item Liczba: 44.75
+    \item W formie naukowej (binarnie): $1.0111 \times 2^5$
+    \item Mantysa: 1.0111 (część przed wykładnikiem)
+    \item Wykładnik: 5 (mówi, o ile przesunąć przecinek)
+\end{itemize}
+
+\subsection{Definicja formalna}
+
+Liczba jest reprezentowana w formie \textbf{naukowej} (notacji wykładniczej):
+\[
+V = (-1)^s \cdot m \cdot b^e
+\]
+
+Gdzie:
+\begin{itemize}
+    \item \textbf{$s$} — bit znaku (sign): 0 = dodatnia, 1 = ujemna
+    \item \textbf{$m$} — mantysa (mantissa/significand): część ułamkowa (zwykle między 1.0 a 2.0)
+    \item \textbf{$b$} — podstawa (base): zwykle 2 (binarny)
+    \item \textbf{$e$} — wykładnik (exponent): mówi, o ile przesunąć przecinek
+\end{itemize}
+
+\textbf{Intuicja:}
+\begin{itemize}
+    \item Mantysa = "cyfry znaczące" (np. 1.2345)
+    \item Wykładnik = "gdzie jest przecinek" (np. $\times 10^5$)
+\end{itemize}
+
+\subsection{Standard IEEE 754 — co to jest?}
+
+\textbf{IEEE 754-2008} to międzynarodowy standard reprezentacji liczb zmiennoprzecinkowych (rewizja IEEE 754-1985).
+
+\textbf{Cel:} Definicja formatów i metod obliczeniowych dostarczających identyczne wyniki niezależnie od implementacji.
+
+\textbf{Zawartość standardu:}
+\begin{itemize}
+    \item Binarne i dziesiętne formaty zmiennoprzecinkowe
+    \item Podstawowe działania: $+$, $-$, $\times$, $\div$, $\sqrt{}$, FMADD, CMP
+    \item Konwersje
+    \item Wyjątki
+\end{itemize}
+
+\textbf{Dlaczego standard?}
+\begin{itemize}
+    \item Wszystkie komputery używają tego samego formatu
+    \item Liczby są przenośne między systemami
+    \item Zapewnia spójność i przewidywalność
+\end{itemize}
+
+\textbf{Reprezentacja ogólna:}
+\[
+X = (-1)^S \cdot 2^E \cdot M
+\]
+
+Gdzie:
+\begin{itemize}
+    \item \textbf{S} — bit znaku (0/1: liczba dodatnia/ujemna)
+    \item \textbf{E} — wykładnik (cecha) — kod z obciążeniem $+2^{k-1}-1$
+    \item \textbf{M} — mnożnik (mantysa) — kod znak-moduł
+\end{itemize}
+
+\textbf{Dwa główne formaty:}
+\begin{itemize}
+    \item \textbf{Float (32-bit, binary32)} — single precision (pojedyncza precyzja)
+    \item \textbf{Double (64-bit, binary64)} — double precision (podwójna precyzja)
+\end{itemize}
+
+\subsection{Charakterystyka reprezentacji zmiennoprzecinkowych}
+
+\textbf{Zalety:}
+\begin{itemize}
+    \item Duży zakres dynamiczny przy niewielkiej liczbie pozycji
+    \item Ustalona dokładność względna
+    \item Niewielka zależność wydajności od zakresu dynamicznego
+    \item Łatwe w użyciu
+    \item Obliczenia realizowane sprzętowo (zazwyczaj)
+\end{itemize}
+
+\textbf{Wady:}
+\begin{itemize}
+    \item Mała dokładność względna w porównaniu z reprezentacją stałoprzecinkową o tym samym rozmiarze
+    \item Zmienna dokładność bezwzględna
+    \item \textbf{Niebezpieczne!} (tracimy część cyfr: dokładność, zaokrąglenia)
+\end{itemize}
+
+\textbf{Ważna uwaga:}
+\begin{quote}
+``Floating point numbers are like piles of sand; every time you move them around, you lose a little sand and pick up a little dirt.''
+
+--- Brian Kernighan and P. J. Plauger
+\end{quote}
+
+\textbf{Reprezentacje zmiennoprzecinkowe $\neq$ rzeczywiste!}
+
+\subsection{Format IEEE 754 (32-bit, single precision, float)}
+
+\textbf{Struktura bitów:}
+\begin{verbatim}
+| S | EEEEEEEE | MMMMMMMMMMMMMMMMMMMMMMM |
+| 1 |    8     |          23             |
+\end{verbatim}
+
+\textbf{Wyjaśnienie każdej części:}
+
+\begin{enumerate}
+    \item \textbf{S (1 bit) — znak:}
+    \begin{itemize}
+        \item 0 = liczba dodatnia
+        \item 1 = liczba ujemna
+    \end{itemize}
+    
+    \item \textbf{E (8 bitów) — wykładnik (cecha):}
+    \begin{itemize}
+        \item Zakres: 0-255 (8 bitów = 256 możliwości)
+        \item \textbf{Kod z obciążeniem:} $+2^{k-1}-1 = +2^{8-1}-1 = +127$
+        \item Rzeczywisty wykładnik = $E - 127$
+        \item \textbf{Zaleta:} Łatwe porównania (reprezentacje ułożone zgodnie z wartościami)
+        \item Przykład: $E = 132 \rightarrow$ wykładnik = $132 - 127 = 5$
+    \end{itemize}
+    
+    \item \textbf{M (23 bity) — mnożnik (mantysa):}
+    \begin{itemize}
+        \item Część ułamkowa mantysy (bez ukrytej jedynki!)
+        \item \textbf{Kod znak-moduł} (w połączeniu z bitem znaku)
+        \item \textbf{Zaleta:} Łatwe porównania, prosta normalizacja (gwarantuje unikalne reprezentacje)
+        \item Wartość mantysy = $1 + M / (2^{23})$
+        \item Przykład: $M = 3342336 \rightarrow M_{dec} = 3342336 / 8388608 \approx 0.3984375$
+        \item Mantysa = $1 + 0.3984375 = 1.3984375$
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Formaty arytmetyczne i wymiany danych:}
+
+Liczba cyfr pól w podstawowych (ang. basic) formatach binarnych:
+\begin{itemize}
+    \item \textbf{binary32} — mnożnik 24(-1) b, wykładnik 8 b
+    \item \textbf{binary64} — mnożnik 53(-1) b, wykładnik 11 b
+    \item \textbf{binary128} — mnożnik 113(-1) b, wykładnik 15 b
+\end{itemize}
+
+\textbf{Formaty rozszerzone (ang. extended):}
+\begin{itemize}
+    \item binary64 (np. mnożnik 64 b, wykładnik 15 b dla X87 FPU)
+\end{itemize}
+
+\textbf{Dlaczego "ukryta jedynka"?}
+\begin{itemize}
+    \item W normalizowanej liczbie mantysa zawsze zaczyna się od 1.xxxxx
+    \item Nie musimy przechowywać tej jedynki (zawsze jest!)
+    \item Oszczędzamy 1 bit $\rightarrow$ więcej precyzji
+    \item Kod wykładnika informuje o wartości bitu ukrytego mnożnika
+\end{itemize}
+
+\subsection{Normalizacja}
+
+\textbf{Problem:} Różne reprezentacje mogą kodować tę samą wartość — niekorzystne!
+
+\textbf{Przykład:}
+\[
+X = 1.98 \cdot 10^{15} = 19.8 \cdot 10^{14} = 0.198 \cdot 10^{16}
+\]
+
+\textbf{Normalizacja w IEEE 754-2008 dla binarnych formatów:}
+\[
+1 \leq M < 2
+\]
+
+\textbf{Przykład:}
+\[
+15.5_{10} = 1.9375 \cdot 2^{3}
+\]
+
+\textbf{Właściwości normalizacji:}
+\begin{itemize}
+    \item Najstarszy bit mnożnika zawsze równy 1
+    \[
+    1.00\ldots 0_2 \leq M \leq 1.11\ldots 1_2
+    \]
+    \item Nie wszystkie wartości można znormalizować
+    \begin{itemize}
+        \item Wielkie liczby $\rightarrow$ nieskończoności
+        \item Małe liczby $\rightarrow$ zdenormalizowane
+        \[
+        0.00\ldots 01_2 \leq M \leq 0.11\ldots 11_2
+        \]
+        (najstarszy bit zawsze 0)
+    \end{itemize}
+\end{itemize}
+
+\subsection{Zakres wartości wykładnika}
+
+\textbf{Możliwe reprezentacje:}
+\[
+0\ldots 0_{2^{k-1}-1} \leq E \leq 1\ldots 1_{2^{k-1}-1}
+\]
+
+\textbf{Wartości skrajne zarezerwowane, czyli:}
+\[
+\begin{aligned}
+0\ldots 01_{2^{k-1}-1} &\leq E \leq 1\ldots 10_{2^{k-1}-1} \\
+1 - (2^{k-1} - 1) &\leq E \leq 2^k - 2 - (2^{k-1} - 1) \\
+-2^{k-1} + 2 &\leq E \leq 2^{k-1} - 1
+\end{aligned}
+\]
+
+\textbf{Przykład dla $k = 8$:}
+\[
+-126 \leq E \leq 127
+\]
+
+\textbf{Specjalne wartości wykładnika:}
+
+\textbf{$E = 1\ldots 1_{2^{k-1}-1}$:}
+\begin{itemize}
+    \item Nieskończoności ($M = 0$)
+    \item Nie-liczby (ang. Not-a-Number, NaN), np. $\sqrt{-1}$ ($M \neq 0$)
+\end{itemize}
+
+\textbf{$E = 0\ldots 0_{2^{k-1}-1}$:}
+\begin{itemize}
+    \item Zero ($M = 0$)
+    \item Liczby zdenormalizowane (pomijamy najstarszy bit mnożnika, $M \neq 0$)
+\end{itemize}
+
+\subsection{Wartość liczby (normalizowana) — wzór i wyjaśnienie}
+
+\textbf{Wzór:}
+\[
+V = (-1)^s \cdot (1 + M) \cdot 2^{(E - 127)}
+\]
+
+\textbf{Rozbijmy na części:}
+
+\begin{enumerate}
+    \item \textbf{$(-1)^s$} — znak:
+    \begin{itemize}
+        \item Jeśli $s = 0$: $(-1)^0 = 1$ (liczba dodatnia)
+        \item Jeśli $s = 1$: $(-1)^1 = -1$ (liczba ujemna)
+    \end{itemize}
+    
+    \item \textbf{$(1 + M)$} — mantysa:
+    \begin{itemize}
+        \item $M = M_{bin} / (2^{23})$ — konwersja binarnej mantysy na ułamek
+        \item Dodajemy 1 (ukryta jedynka)
+        \item Wynik: wartość między 1.0 a 2.0 (prawie)
+    \end{itemize}
+    
+    \item \textbf{$2^{(E - 127)}$} — potęga 2:
+    \begin{itemize}
+        \item $E$ — wartość z 8 bitów (0-255)
+        \item Odejmujemy bias (127), żeby móc reprezentować ujemne wykładniki
+        \item Rzeczywisty wykładnik = $E - 127$ (zakres: -126 do 127)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Przykłady reprezentacji (binary32)}
+
+\[
+\begin{aligned}
+0\ 00000000\ 00000000000000000000000_2 &= +0 \\
+80000000_{16} &= -0 \\
+7F800000_{16} &= +\infty \\
+FF800000_{16} &= -\infty \\
+7F000000_{16} &= (-1)^0 \cdot 2^{254-127} \cdot 1.0\ldots 0_2 = 2^{127} \approx 10^{38} \\
+00800000_{16} &= (-1)^0 \cdot 2^{1-127} \cdot 1.0\ldots 0_2 = 2^{-126} \approx 10^{-38} \\
+00000001_{16} &= (-1)^0 \cdot 2^{1-127} \cdot 0.0\ldots 1_2 = 2^{-126} \cdot 2^{-23} \approx 10^{-45}
+\end{aligned}
+\]
+
+\subsection{Format IEEE 754 (64-bit, double precision, double)}
+
+\begin{verbatim}
+| S | EEEEEEEEEEE | MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM |
+| 1 |     11      |                         52                          |
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{S} (1 bit) — znak
+    \item \textbf{E} (11 bitów) — wykładnik (bias = 1023)
+    \item \textbf{M} (52 bity) — mantysa
+\end{itemize}
+
+\subsection{Wartość liczby (normalizowana):}
+\[
+V = (-1)^s \cdot (1 + M) \cdot 2^{(E - 1023)}
+\]
+
+Gdzie:
+\begin{itemize}
+    \item $M = M_{bin} / (2^{52})$
+    \item $E$ — wykładnik (0-2047, z bias 1023)
+\end{itemize}
+
+\section{Błędy i precyzja — dlaczego liczby nie są idealne?}
+
+\subsection{Wprowadzenie — dlaczego są błędy?}
+
+\textbf{Problem:} Komputer ma \textbf{ograniczoną pamięć} (skończoną liczbę bitów).
+
+\textbf{Przykład:}
+\begin{itemize}
+    \item Chcesz zapisać: 0.1 (dziesiętnie)
+    \item W binarnym: 0.00011001100110011... (nieskończone!)
+    \item Komputer ma tylko 23 bity na mantysę $\rightarrow$ musi \textbf{zaokrąglić}
+    \item Wynik: $0.1 \approx 0.100000001490116119384765625$
+    \item \textbf{Błąd!} Różnica jest mała, ale istnieje.
+\end{itemize}
+
+\textbf{Wniosek:} Większość liczb dziesiętnych nie ma dokładnej reprezentacji binarnej!
+
+\subsection{Błąd względny (Relative Error) — co to jest?}
+
+\textbf{Definicja:} Jak duży jest błąd w stosunku do wartości?
+
+\textbf{Wzór:}
+\[
+\varepsilon_{rel} = \frac{|x_{rzeczywista} - x_{reprezentowana}|}{|x_{rzeczywista}|}
+\]
+
+\textbf{Intuicja:} Błąd względny mówi, jaki procent wartości jest błędny.
+
+\subsection{Błąd bezwzględny (Absolute Error) — co to jest?}
+
+\textbf{Definicja:} Jaka jest różnica między wartością rzeczywistą a reprezentowaną?
+
+\textbf{Wzór:}
+\[
+\varepsilon_{abs} = |x_{rzeczywista} - x_{reprezentowana}|
+\]
+
+\textbf{Intuicja:} Błąd bezwzględny mówi, o ile się różnią (w tych samych jednostkach).
+
+\subsection{Machine Epsilon ($\varepsilon$) — najmniejsza różnica}
+
+\textbf{Definicja:} najmniejsza liczba taka, że $1 + \varepsilon > 1$
+
+\textbf{Intuicja:} Machine epsilon to najmniejsza liczba, którą można dodać do 1, żeby komputer zauważył różnicę.
+
+\textbf{Dla formatu z $p$ bitami mantysy:}
+\[
+\varepsilon = 2^{-p}
+\]
+
+\textbf{Wyjaśnienie:}
+\begin{itemize}
+    \item Im więcej bitów mantysy, tym mniejszy epsilon (lepsza precyzja)
+    \item Epsilon mówi o \textbf{precyzji} reprezentacji
+\end{itemize}
+
+\textbf{Wartości:}
+\begin{itemize}
+    \item \textbf{Float (23 bity):} $\varepsilon \approx 1.19 \times 10^{-7}$
+    \begin{itemize}
+        \item Oznacza: możemy rozróżnić liczby różniące się o $\sim 0.0000001$
+        \item Precyzja: $\sim 7$ cyfr dziesiętnych
+    \end{itemize}
+    
+    \item \textbf{Double (52 bity):} $\varepsilon \approx 2.22 \times 10^{-16}$
+    \begin{itemize}
+        \item Oznacza: możemy rozróżnić liczby różniące się o $\sim 0.0000000000000002$
+        \item Precyzja: $\sim 15-17$ cyfr dziesiętnych
+    \end{itemize}
+\end{itemize}
+
+\section{Utrata dokładności}
+
+\subsection{Rodzaje utraty dokładności}
+
+\textbf{1. Łagodna (ang. benign cancellation):}
+\begin{itemize}
+    \item Operacja na dokładnych wartościach
+    \item Przeciwdziałanie — cyfry chroniące
+\end{itemize}
+
+\textbf{2. Katastroficzna (ang. catastrophic cancellation):}
+\begin{itemize}
+    \item Operacja na niedokładnych argumentach (wcześniejsze zaokrąglenia lub bieżąca denormalizacja)
+    \item Przeciwdziałanie — przebudowa algorytmu
+\end{itemize}
+
+\subsection{Przeciwdziałanie katastroficznej utracie dokładności}
+
+\begin{itemize}
+    \item \textbf{Pierwiastki równania kwadratowego} — wzory Viete'a
+    \item \textbf{Sumowanie wielooperandowe} — algorytm Kahana (kosztowny), sumowanie kaskadowe (dziel i rządź)
+    \item \textbf{Różnica kwadratów:} $x^2 - y^2 = (x + y)(x - y)$
+    \item \textbf{Pole trójkąta:}
+    \[
+    \sqrt{s(s-a)(s-b)(s-c)}, \quad s = (a+b+c)/2
+    \]
+    Lepsze:
+    \[
+    \sqrt{(a+(b+c))(c-(a-b))(c+(a-b))(a+(b-c))} / 4
+    \]
+\end{itemize}
+
+\subsection{Skutki błędów zaokrągleń — przykłady katastrof}
+
+\textbf{1. Giełda Papierów Wartościowych w Vancouver (styczeń 1982 — listopad 1983)}
+\begin{itemize}
+    \item Indeks: 524.811 (obliczony), 1098.892 (rzeczywisty)
+    \item Kumulacja błędów zaokrągleń
+\end{itemize}
+
+\textbf{2. Awaria rakiety Patriot (25.02.1991)}
+\begin{itemize}
+    \item 28 zabitych
+    \item Niedokładny pomiar czasu (obcięcie do 24 bitów)
+    \item Kumulacja błędów zaokrągleń
+\end{itemize}
+
+\textbf{3. Wybuch rakiety Ariane 5 (4.04.1996)}
+\begin{itemize}
+    \item Lot testowy (10 lat, 7 mld \$)
+    \item Konwersja 64 bitów zmiennoprzecinkowego do 16 bitów stałoprzecinkowego
+\end{itemize}
+
+\section{Wyjątki}
+
+\subsection{Rodzaje wyjątków}
+
+Niebezpieczeństwo niepoprawnego lub niedokładnego wyniku:
+
+\begin{itemize}
+    \item \textbf{Nadmiar/niedomiar}
+    \item \textbf{Utrata dokładności} (wynik zaokrąglania)
+    \item \textbf{Dzielenie przez 0} ($\log(0)$) — wynik $\pm\infty$
+    \item \textbf{Niedozwolona operacja} (bezużyteczny wynik — NaN):
+    \begin{itemize}
+        \item $0 \cdot \infty$
+        \item $(+\infty) + (-\infty)$
+        \item $0/0$
+        \item $\infty / \infty$
+        \item $\sqrt{-1}$
+    \end{itemize}
+    \item \textbf{Argument jest sygnalizującą nie-liczbą}
+    \item \textbf{Specyficzne dla maszyny}, np.: błąd stosu, zdenormalizowany operand (x87 FPU)
+\end{itemize}
+
+\section{Problemy i pułapki}
+
+\subsection{Porównywanie liczb zmiennoprzecinkowych — szczegółowo}
+
+\textbf{Problem:} Liczby zmiennoprzecinkowe mają błędy zaokrąglenia, więc rzadko są dokładnie równe.
+
+\textbf{Rozwiązanie 1: Porównanie z epsilon (stałym)}
+
+\textbf{ZŁE:}
+\begin{lstlisting}[language=Java]
+if (a == b) { }  // Rzadko działa poprawnie!
+\end{lstlisting}
+
+\textbf{DOBRE:}
+\begin{lstlisting}[language=Java]
+double epsilon = 1e-9;  // 0.000000001
+if (Math.abs(a - b) < epsilon) {
+    // Liczby są "równe" (różnica < epsilon)
+}
+\end{lstlisting}
+
+\textbf{Rozwiązanie 2: Porównanie względne (lepsze dla dużych liczb)}
+
+\textbf{Wzór:}
+\[
+|a - b| < \varepsilon \cdot \max(|a|, |b|)
+\]
+
+\subsection{Utrata precyzji przy odejmowaniu (Catastrophic Cancellation)}
+
+\textbf{Problem:} Gdy odejmujemy dwie bardzo podobne liczby, tracimy precyzję.
+
+\textbf{Lepsze podejście — racjonalizacja:}
+\[
+\sqrt{x + 1} - \sqrt{x} = \frac{1}{\sqrt{x + 1} + \sqrt{x}}
+\]
+
+\subsection{Przepełnienie (Overflow)}
+
+\textbf{Problem:} Gdy wynik jest zbyt duży dla reprezentacji, staje się nieskończonością.
+
+\textbf{Wartości graniczne:}
+\begin{itemize}
+    \item \textbf{Float:} MAX\_VALUE $\approx 3.4028235 \times 10^{38}$
+    \item \textbf{Double:} MAX\_VALUE $\approx 1.7976931348623157 \times 10^{308}$
+\end{itemize}
+
+\subsection{Niedomiar (Underflow)}
+
+\textbf{Problem:} Gdy wynik jest zbyt mały, może stać się zerem lub liczbą zdenormalizowaną.
+
+\textbf{Wartości graniczne:}
+\begin{itemize}
+    \item \textbf{Float:} MIN\_NORMAL $\approx 1.175494 \times 10^{-38}$
+    \item \textbf{Double:} MIN\_NORMAL $\approx 2.2250738585072014 \times 10^{-308}$
+\end{itemize}
+
+\section{Schematy zaokrąglania}
+
+\subsection{Wprowadzenie}
+
+Działania na mnożnikach mogą wygenerować większą liczbę cyfr niż dopuszcza format.
+
+\textbf{Cyfry dodatkowe:}
+\begin{itemize}
+    \item \textbf{R} — bit o wadze $\frac{1}{2}$ ulp
+    \item \textbf{S} — suma logiczna pozostałych bitów
+\end{itemize}
+
+\textbf{Interpretacja bitów R, S:}
+\begin{itemize}
+    \item $R, S = 0, x \rightarrow < 0.5$ ulp
+    \item $R, S = 1, 0 \rightarrow = 0.5$ ulp
+    \item $R, S = 1, 1 \rightarrow > 0.5$ ulp
+\end{itemize}
+
+\textbf{Generowanie bitów:}
+\begin{itemize}
+    \item \textbf{R} — wytworzyć jako dodatkowy bit wyniku
+    \item \textbf{S} — uproszczone metody:
+    \begin{itemize}
+        \item Dzielenie — reszta
+        \item Mnożenie — analiza najmłodszych bitów czynników
+        \item Dodawanie/odejmowanie — denormalizacja
+    \end{itemize}
+\end{itemize}
+
+\subsection{Tryby zaokrąglania w IEEE 754-2008}
+
+Standard definiuje 5 trybów zaokrąglania:
+
+\begin{enumerate}
+    \item \textbf{roundTiesToEven} — symetryczne do parzystej (domyślny)
+    \begin{itemize}
+        \item Jeśli $RS = 10$, zaokrąglamy tak, aby najmniej znaczący bit mnożnika zaokrąglonego był parzysty
+        \item Średni błąd równy 0 (w połowie przypadków spornych zaokrąglamy w górę, a w połowie w dół)
+        \item \textbf{UWAGA} — różny od ``szkolnego'' zaokrąglania
+    \end{itemize}
+    
+    \item \textbf{roundTiesToAway} — symetryczne do większej wartości bezwzględnej
+    \begin{itemize}
+        \item Podobne do ``szkolnego'' zaokrąglania
+    \end{itemize}
+    
+    \item \textbf{roundTowardPositive} — do $+\infty$
+    \begin{itemize}
+        \item Dodatnie w górę, ujemne w dół
+        \item Arytmetyka przedziałowa
+    \end{itemize}
+    
+    \item \textbf{roundTowardNegative} — do $-\infty$
+    \begin{itemize}
+        \item Dodatnie w dół, ujemne w górę
+        \item Arytmetyka przedziałowa
+    \end{itemize}
+    
+    \item \textbf{roundTowardZero} — obcięcie (truncation)
+    \begin{itemize}
+        \item Prosta implementacja, ale niedoszacowanie
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Przykłady zaokrąglania do parzystej:}
+\[
+\begin{aligned}
+1\ldots 0010\ 10 &\rightarrow 1\ldots 0010 \\
+1\ldots 0011\ 10 &\rightarrow 1\ldots 0100 \quad \text{(propagacja przeniesienia)} \\
+1\ldots 0011\ 01 &\rightarrow 1\ldots 0011 \\
+1\ldots 0010\ 11 &\rightarrow 1\ldots 0011
+\end{aligned}
+\]
+
+\textbf{Uwaga:} W przypadku bardziej złożonych operacji standard jedynie zaleca poprawne zaokrąglanie. Ta sama funkcja w kodzie programu może dać różne rezultaty w zależności od flag kompilatora, jakości kodu, zainstalowanych bibliotek itd.
+
+\section{Operacje arytmetyczne w zmiennoprzecinkowej — szczegółowo}
+
+\subsection{Mnożenie}
+
+\textbf{Wzór:}
+\[
+M_1 \cdot 2^{E_1} \times M_2 \cdot 2^{E_2} = (M_1 \times M_2) \cdot 2^{E_1 + E_2}
+\]
+
+\textbf{Właściwości:}
+\[
+1 \leq M < 2 \rightarrow \underbrace{1 \leq M \cdot M < 4}_{\text{Może być potrzebna normalizacja}}
+\]
+
+\textbf{Kroki:}
+\begin{enumerate}
+    \item Dodaj wykładniki: $E_{wynik} = E_1 + E_2 - \text{bias}$ (odejmujemy bias, bo każdy wykładnik już miał bias)
+    \item Pomnóż mantysy: $M_{wynik} = M_1 \cdot M_2$
+    \item Znormalizuj wynik — jeśli $M_{wynik} \geq 2$, przesuń w prawo i zwiększ wykładnik
+    \item Zaokrąglij mantysę
+    \item Sprawdź overflow/underflow
+    \item Znak wyniku
+\end{enumerate}
+
+\textbf{Przykłady:}
+\[
+\begin{aligned}
+1.000_2 \times 1.000_2 &= 1.000000_2 \quad \text{(normalizacja zbędna, bity R,S = 0,0)} \\
+1.111_2 \times 1.111_2 &= 11.100001_2 \quad \text{(normalizacja konieczna, bity R,S = 0,1)}
+\end{aligned}
+\]
+
+Przy normalizacji korekta wykładnika: $E = E + 1$
+
+\subsection{Dzielenie}
+
+\textbf{Wzór:}
+\[
+M_1 \cdot 2^{E_1} \div M_2 \cdot 2^{E_2} = (M_1 \div M_2) \cdot 2^{E_1 - E_2}
+\]
+
+\textbf{Właściwości:}
+\[
+1 \leq M_{1,2} < 2 \rightarrow 0.5 < M_1 \div M_2 < 2
+\]
+
+\textbf{UWAGA — dodatkowy bit!}
+
+Cyfra chroniąca G czasami zbędna: transformacja GRS $\rightarrow$ RS
+
+\textbf{Kroki:}
+\begin{enumerate}
+    \item Odejmij wykładniki: $E_{wynik} = E_1 - E_2 + \text{bias}$ (dodajemy bias, bo odejmując tracimy jeden bias)
+    \item Podziel mantysy: $M_{wynik} = M_1 / M_2$
+    \item Znormalizuj wynik — jeśli $M_{wynik} < 1$, przesuń w lewo i zmniejsz wykładnik
+    \item Zaokrąglij mantysę
+    \item Sprawdź overflow/underflow i dzielenie przez zero
+    \item Znak wyniku
+\end{enumerate}
+
+\textbf{Przykłady:}
+\[
+\begin{aligned}
+1.111_2 \div 1.000_2 &= 1.111_2 \quad \text{(GRS = 000, normalizacja zbędna $\rightarrow$ $R = G$, $S = R \vee S$)} \\
+1.000_2 \div 1.111_2 &= 0.100_2 \quad \text{(GRS = 011, normalizacja konieczna, bity R,S = 1,1)}
+\end{aligned}
+\]
+
+Przy normalizacji korekta wykładnika: $E = E - 1$
+
+\subsection{Dodawanie}
+
+\textbf{Wzór:}
+\[
+M_1 \cdot 2^{E_1} + M_2 \cdot 2^{E_2}
+\]
+
+Może być potrzebna denormalizacja.
+
+\textbf{Kroki:}
+\begin{enumerate}
+    \item Wyrównaj wykładniki i denormalizuj operand o mniejszym wykładniku (utrata dokładności)
+    \item Oblicz sumę: $1 < M_1 + M_2 < 4$
+    \item Ewentualna normalizacja wyniku (nadmiar)
+    \item Zaokrąglenie
+\end{enumerate}
+
+\subsection{Odejmowanie}
+
+\textbf{Wzór:}
+\[
+M_1 \cdot 2^{E_1} - M_2 \cdot 2^{E_2}
+\]
+
+Podobnie jak przy dodawaniu, ale:
+
+\[
+\begin{array}{c}
+\phantom{-}1.0000\ 0000\ 0000\ 0000\ 000\ 000 \\
+-0.1111\ 1111\ 1111\ 1111\ 111\ 100 \\
+\hline
+\phantom{-}0.0000\ 0000\ 0000\ 0000\ 000\ 100 \\
+\hline
+1.0???\ ????\ ????\ ????\ ??\ ???
+\end{array}
+\]
+
+Bez cyfry chroniącej jeszcze gorzej!
+
+\section{Wzory podsumowujące}
+
+\subsection{Stałoprzecinkowa (Qm.n):}
+\[
+V = \frac{N}{2^n}
+\]
+
+Dodawanie:
+\[
+V_1 + V_2 = \frac{N_1 + N_2}{2^n}
+\]
+
+Mnożenie:
+\[
+V_1 \cdot V_2 = \frac{N_1 \cdot N_2}{2^{2n}} \rightarrow \text{shift right } n \text{ bitów}
+\]
+
+\subsection{Zmiennoprzecinkowa (IEEE 754):}
+\[
+V = (-1)^s \cdot (1 + M) \cdot 2^{(E - \text{bias})}
+\]
+
+\textbf{Float:}
+\begin{itemize}
+    \item Bias = 127
+    \item Precyzja: $\sim 7$ cyfr dziesiętnych
+    \item Zakres: $\approx 10^{\pm 38}$
+\end{itemize}
+
+\textbf{Double:}
+\begin{itemize}
+    \item Bias = 1023
+    \item Precyzja: $\sim 15-17$ cyfr dziesiętnych
+    \item Zakres: $\approx 10^{\pm 308}$
+\end{itemize}
+
+\subsection{Machine Epsilon:}
+\[
+\varepsilon = 2^{-p}
+\]
+
+Gdzie $p$ to liczba bitów mantysy (bez ukrytej jedynki).
+
+\subsection{Błąd względny:}
+\[
+\varepsilon_{rel} = \frac{|x_{rzeczywista} - x_{reprezentowana}|}{|x_{rzeczywista}|}
+\]
+
+\subsection{Porównywanie liczb:}
+\[
+|a - b| < \varepsilon \cdot \max(|a|, |b|)
+\]
+
+\section{Stałobazowe systemy liczbowe}
+
+\subsection{Charakterystyka}
+
+\textbf{Reprezentacje stałoprzecinkowe} (np. int):
+\begin{itemize}
+    \item Ustalona dokładność bezwzględna (ulp)
+    \item Liczba cyfr określa zakres dynamiczny (ang. dynamic range)
+    \item Niewygodne dla dużych zakresów dynamicznych
+    \item Niewydajne dla dużych zakresów dynamicznych
+\end{itemize}
+
+\textbf{Uwaga:} Nie zawsze potrzebujemy stałej dokładności bezwzględnej (przykład — wielkości fizyczne).
+
+\subsection{Rodzaje kodów}
+
+\begin{enumerate}
+    \item \textbf{Naturalny}
+    \item \textbf{Uzupełnieniowy pełny}
+    \item \textbf{Znak-moduł}
+    \begin{itemize}
+        \item Reprezentacja naturalna + znak
+        \item Intuicyjny zapis
+        \item Symetryczny zakres
+        \item Podwójna reprezentacja zera
+        \item Komplikacja działań — konieczna analiza znaku (dodawanie, odejmowanie)
+    \end{itemize}
+    \item \textbf{Ze znakowaną cyfrą (SD)}
+    \item \textbf{Z obciążeniem (spolaryzowany)}
+\end{enumerate}
+
+\subsection{Kod z obciążeniem (spolaryzowany)}
+
+\textbf{Definicja:}
+\begin{itemize}
+    \item Podstawa: $\beta$
+    \item Zbiór cyfr: $D = \{0, 1, 2, \ldots, \beta-1\}$
+    \item Wektor wag: $W = \{\beta^{k-1}, \ldots, \beta^1, \beta^0, \beta^{-1}, \ldots, \beta^{-m}\}$
+    \item Obciążenie: $N$
+    \item Wartość liczby: $X = X \cdot W - N = \sum_i x_i \beta^i - N$
+\end{itemize}
+
+\textbf{Obciążenie postaci $+2^{k-1}-1$:}
+\[
+X = \sum_{i=0}^{k-1} x_i 2^i - (2^{k-1} - 1) = \sum_{i=0}^{k-1} x_i 2^i - \sum_{i=0}^{k-2} 2^i
+\]
+
+\textbf{Właściwości:}
+\begin{itemize}
+    \item Unikalna reprezentacja 0 (``równa'' $N$)
+    \item Kolejność reprezentacji odpowiada kolejności wartości
+    \item Niemożliwe uzyskanie symetrycznego względem zera zakresu dla parzystej podstawy
+    \item Komplikacja działań arytmetycznych
+    \item Łatwa konwersja na system U2
+    \item Przydatne do porównywania wykładników reprezentacji zmiennoprzecinkowych
+\end{itemize}
+
+\textbf{Przykład:}
+\[
+1011_{+2^{3}-1} = 4_{10} \rightarrow 1100_{U2} = -4_{10}
+\]
+
+\section{Kluczowe zdania na obronę}
+
+\begin{enumerate}
+    \item \textbf{Stałoprzecinkowa} = pozycja przecinka jest ustalona, reprezentacja jako liczba całkowita podzielona przez stałą.
+    
+    \item \textbf{Zmiennoprzecinkowa} = pozycja przecinka jest zmienna, reprezentacja w formie naukowej (mantysa $\times 2^{\text{wykładnik}}$).
+    
+    \item \textbf{IEEE 754-2008} to standard reprezentacji liczb zmiennoprzecinkowych (rewizja IEEE 754-1985), definiuje formaty i metody obliczeniowe dostarczające identyczne wyniki niezależnie od implementacji.
+    
+    \item \textbf{Precyzja float} $\approx 7$ cyfr dziesiętnych, \textbf{double} $\approx 15-17$ cyfr dziesiętnych.
+    
+    \item \textbf{Machine epsilon} to najmniejsza liczba taka, że $1 + \varepsilon > 1$.
+    
+    \item \textbf{Błędy zaokrąglenia} kumulują się przy wielu operacjach — dlatego nie porównujemy przez \texttt{==}.
+    
+    \item \textbf{Catastrophic cancellation} — utrata precyzji przy odejmowaniu podobnych liczb (operacja na niedokładnych argumentach).
+    
+    \item \textbf{Benign cancellation} — utrata precyzji przy operacji na dokładnych wartościach (przeciwdziałanie — cyfry chroniące).
+    
+    \item \textbf{Zmiennoprzecinkowa} nie jest asocjatywna — kolejność operacji ma znaczenie.
+    
+    \item \textbf{Stałoprzecinkowa} = szybka, deterministyczna, ale ograniczony zakres.
+    
+    \item \textbf{Zmiennoprzecinkowa} = szeroki zakres, ale błędy mogą się kumulować.
+    
+    \item \textbf{Normalizacja} w IEEE 754: $1 \leq M < 2$ (najstarszy bit mnożnika zawsze równy 1).
+    
+    \item \textbf{5 trybów zaokrąglania} w IEEE 754-2008: roundTiesToEven (domyślny), roundTiesToAway, roundTowardPositive, roundTowardNegative, roundTowardZero.
+    
+    \item \textbf{Przykłady katastrof:} Giełda w Vancouver (1982-1983), rakieta Patriot (1991), rakieta Ariane 5 (1996).
+    
+    \item \textbf{Kod z obciążeniem} — przydatny do porównywania wykładników reprezentacji zmiennoprzecinkowych.
+\end{enumerate}
+
+\section{Źródła}
+
+Materiały dydaktyczne:
+\begin{itemize}
+    \item dr inż. Tadeusz Tomczak, Politechnika Wrocławska
+    \item tadeusz.tomczak@pwr.wroc.pl
+    \item pok. 223 bud. C3
+    \item ``Arytmetyka komputerów'' — wykłady
+\end{itemize}
+
+\end{document}
+
